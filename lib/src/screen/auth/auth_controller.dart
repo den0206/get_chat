@@ -15,6 +15,7 @@ class AuthController extends GetxService {
   void onInit() async {
     user.bindStream(auth.authStateChanges());
     user.bindStream(auth.userChanges());
+    ever(user, (value) => print(value));
 
     await setCurrentUser();
 

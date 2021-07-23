@@ -5,9 +5,10 @@ import 'package:get/get.dart';
 import 'package:getx_chat/src/screen/auth/login/login_screen.dart';
 import 'package:getx_chat/src/screen/auth/signup/signup_controller.dart';
 import 'package:getx_chat/src/screen/auth/signup/signup_screen.dart';
-import 'package:getx_chat/src/screen/home/home_controller.dart';
 import 'package:getx_chat/src/screen/home/home_screen.dart';
 import 'package:getx_chat/src/screen/root.dart';
+import 'package:getx_chat/src/screen/user_detail/user_detail_controller.dart';
+import 'package:getx_chat/src/screen/user_detail/user_detail_sceen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,6 +49,11 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: HomeScreen.routeName,
           page: () => HomeScreen(),
+        ),
+        GetPage(
+          name: UserDetailScreen.routeName,
+          page: () => UserDetailScreen(),
+          binding: UserDetailBinding(),
         )
       ],
       initialRoute: Root.routeName,

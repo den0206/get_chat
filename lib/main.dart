@@ -2,10 +2,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:getx_chat/src/screen/auth/login/login_controller.dart';
 import 'package:getx_chat/src/screen/auth/login/login_screen.dart';
 import 'package:getx_chat/src/screen/auth/signup/signup_controller.dart';
 import 'package:getx_chat/src/screen/auth/signup/signup_screen.dart';
+import 'package:getx_chat/src/screen/home/home_controller.dart';
+import 'package:getx_chat/src/screen/home/home_screen.dart';
 import 'package:getx_chat/src/screen/root.dart';
 
 Future<void> main() async {
@@ -37,12 +38,16 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: LoginScreen.routeName,
           page: () => LoginScreen(),
-          binding: LoginBinding(),
+          // binding: LoginBinding(),
         ),
         GetPage(
           name: SignUpScreen.routeName,
           page: () => SignUpScreen(),
           binding: SignupBinding(),
+        ),
+        GetPage(
+          name: HomeScreen.routeName,
+          page: () => HomeScreen(),
         )
       ],
       initialRoute: Root.routeName,

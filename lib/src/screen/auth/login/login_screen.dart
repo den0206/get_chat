@@ -7,13 +7,14 @@ import 'package:getx_chat/src/screen/widgets/custom_textfield.dart';
 import 'package:getx_chat/src/screen/widgets/images_crousel.dart';
 import 'package:get/get.dart';
 
-class LoginScreen extends GetView<LoginController> {
+class LoginScreen extends StatelessWidget {
   LoginScreen({Key? key}) : super(key: key);
   static const routeName = '/Login';
   final _formKey = GlobalKey<FormState>(debugLabel: '_LoginState');
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(LoginController());
     return Scaffold(
       body: Stack(
         children: [
@@ -93,7 +94,7 @@ class LoginScreen extends GetView<LoginController> {
                         child: Column(
                           children: [
                             CustomTextField(
-                              controller: TextEditingController(),
+                              controller: controller.emailController,
                               labelText: "Email",
                               icon: Icon(
                                 Icons.email,
@@ -104,7 +105,7 @@ class LoginScreen extends GetView<LoginController> {
                               height: 15,
                             ),
                             CustomTextField(
-                              controller: TextEditingController(),
+                              controller: controller.passwordController,
                               labelText: "Password",
                               isSecure: true,
                               icon: Icon(
@@ -132,7 +133,10 @@ class LoginScreen extends GetView<LoginController> {
                                 title: "Login",
                                 isLoading: controller.isLoading.value,
                                 onPressed: () {
-                                  controller.loginUser();
+                                  if (_formKey.currentState!.validate()) {
+                                    FocusScope.of(context).unfocus();
+                                    controller.loginUser();
+                                  }
                                 },
                               ),
                             ),

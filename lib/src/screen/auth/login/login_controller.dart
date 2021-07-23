@@ -1,7 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:get/instance_manager.dart';
 import 'package:get/state_manager.dart';
+import 'package:getx_chat/src/screen/auth/auth_controller.dart';
+import 'package:getx_chat/src/screen/widgets/custom_dialog.dart';
 
 class LoginBinding extends Bindings {
   @override
@@ -14,6 +17,9 @@ class LoginController extends GetxController {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  final authControllr = Get.find<AuthController>();
+
+  final _auth = FirebaseAuth.instance;
   RxBool isLoading = false.obs;
 
   String get _email => emailController.text;
@@ -26,14 +32,27 @@ class LoginController extends GetxController {
 
   @override
   void onClose() {
+    emailController.clear();
+    passwordController.clear();
     super.onClose();
   }
 
   Future<void> loginUser() async {
     isLoading.value = true;
 
-    await Future.delayed(Duration(seconds: 2));
+    try {
+      UserCredential _credential = await _auth.signInWithEmailAndPassword(
+          email: _email, password: _password);
 
-    isLoading.value = false;
+      if (_credential.user != null) {
+        await authControllr.setCurrentUser();
+        print("Success");
+        onClose();
+      }
+    } catch (e) {
+      showError(e);
+    } finally {
+      isLoading.value = false;
+    }
   }
 }

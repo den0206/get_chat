@@ -1,0 +1,44 @@
+import 'package:flutter/material.dart';
+import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+import 'package:get/get.dart';
+import 'package:getx_chat/src/screen/home/home_screen.dart';
+import 'package:getx_chat/src/screen/users/users_screen.dart';
+
+class MainTabController extends GetxController {
+  var currentIndex = 0;
+
+  final bottomItems = [
+    BottomNavigationBarItem(
+      label: "Home",
+      icon: Icon(
+        Icons.home,
+      ),
+    ),
+    BottomNavigationBarItem(
+      label: "Users",
+      icon: Icon(
+        Icons.person,
+      ),
+    ),
+  ];
+
+  final List<Widget> pages = [
+    HomeScreen(),
+    UsersScreen(),
+  ];
+
+  @override
+  void onInit() {
+    super.onInit();
+  }
+
+  @override
+  void onClose() {
+    super.onClose();
+  }
+
+  void setIndex(int value) {
+    currentIndex = value;
+    update();
+  }
+}

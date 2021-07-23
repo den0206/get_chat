@@ -1,16 +1,51 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:get/get.dart';
+import 'package:getx_chat/src/model/fb_user.dart';
+import 'package:getx_chat/src/utils/firebaseRef.dart';
 
 class AuthController extends GetxService {
   Rxn<User> user = Rxn<User>();
   FirebaseAuth auth = FirebaseAuth.instance;
 
+  FBUser? currentUser;
+  FBUser get current => currentUser!;
+
   @override
-  void onInit() {
+  void onInit() async {
     user.bindStream(auth.authStateChanges());
     user.bindStream(auth.userChanges());
 
+    await setCurrentUser();
+
     super.onInit();
   }
+
+  Future<void> setCurrentUser({String? uid}) async {
+    if (auth.currentUser == null) {
+      print("No Auth");
+      return;
+    }
+
+    final userId = uid ?? auth.currentUser?.uid;
+
+    if (userId != null) {
+      final doc = await firebaseRef(FirebaseRef.user).doc(userId).get();
+
+      currentUser = FBUser.fromMap(doc);
+    } else {
+      print("No ID");
+    }
+  }
+
+  Future<void> logout() async {
+    try {
+      await auth.signOut();
+      currentUser = null;
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 }
+
+final current = Get.find<AuthController>().current;

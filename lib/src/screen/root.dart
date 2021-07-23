@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
-import 'package:getx_chat/src/screen/auth/login/login_controller.dart';
 import 'package:getx_chat/src/screen/auth/login/login_screen.dart';
-import 'package:getx_chat/src/screen/home/home_screen.dart';
 import 'package:get/get.dart';
+import 'package:getx_chat/src/screen/common/main_tab_screen.dart';
+import 'package:getx_chat/src/screen/home/home_controller.dart';
 
 class Root extends StatelessWidget {
   const Root({Key? key}) : super(key: key);
@@ -16,9 +16,9 @@ class Root extends StatelessWidget {
       init: AuthController(),
       builder: (controller) {
         if (controller.user.value?.uid != null) {
-          return HomeScreen();
+          Get.put(HomeController());
+          return MainTabScreen();
         } else {
-          Get.put(LoginController());
           return LoginScreen();
         }
       },

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:get/get.dart';
 import 'package:getx_chat/src/model/fb_user.dart';
+import 'package:getx_chat/src/screen/auth/auth_controller.dart';
+import 'package:getx_chat/src/screen/widgets/custom_dialog.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
 
 class SignupBinding extends Bindings {
@@ -16,6 +18,8 @@ class SignUpController extends GetxController {
   TextEditingController nameTextControlller = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+  final authControllr = Get.find<AuthController>();
 
   final _auth = FirebaseAuth.instance;
 
@@ -41,10 +45,13 @@ class SignUpController extends GetxController {
         );
         await firebaseRef(FirebaseRef.user).doc(_uid).set(user.toMap());
 
+        authControllr.currentUser = user;
+
         print("Success");
       }
     } catch (e) {
       print(e.toString());
+      showError(e);
     } finally {
       isLoading.value = false;
     }

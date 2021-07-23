@@ -92,7 +92,7 @@ class SignUpScreen extends GetView<SignUpController> {
                         child: Column(
                           children: [
                             CustomTextField(
-                              controller: TextEditingController(),
+                              controller: controller.nameTextControlller,
                               labelText: "name",
                               icon: Icon(
                                 Icons.person,
@@ -103,7 +103,7 @@ class SignUpScreen extends GetView<SignUpController> {
                               height: 15,
                             ),
                             CustomTextField(
-                              controller: TextEditingController(),
+                              controller: controller.emailController,
                               labelText: "Email",
                               icon: Icon(
                                 Icons.email,
@@ -114,24 +114,12 @@ class SignUpScreen extends GetView<SignUpController> {
                               height: 15,
                             ),
                             CustomTextField(
-                              controller: TextEditingController(),
+                              controller: controller.passwordController,
                               labelText: "Password",
                               isSecure: true,
                               icon: Icon(
                                 Icons.lock,
                                 color: Colors.grey,
-                              ),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: TextButton(
-                                child: Text(
-                                  "Forgot password",
-                                ),
-                                onPressed: () {},
                               ),
                             ),
                             SizedBox(
@@ -143,7 +131,10 @@ class SignUpScreen extends GetView<SignUpController> {
                                 isLoading: controller.isLoading.value,
                                 background: Colors.green,
                                 onPressed: () {
-                                  controller.register();
+                                  if (_formKey.currentState!.validate()) {
+                                    FocusScope.of(context).unfocus();
+                                    controller.register();
+                                  }
                                 },
                               ),
                             ),

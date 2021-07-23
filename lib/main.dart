@@ -1,12 +1,20 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:getx_chat/src/screen/auth/login/login_controller.dart';
 import 'package:getx_chat/src/screen/auth/login/login_screen.dart';
 import 'package:getx_chat/src/screen/auth/signup/signup_controller.dart';
 import 'package:getx_chat/src/screen/auth/signup/signup_screen.dart';
+import 'package:getx_chat/src/screen/root.dart';
 
-void main() {
-  runApp(MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) {
+    runApp(MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -23,6 +31,10 @@ class MyApp extends StatelessWidget {
       ),
       getPages: [
         GetPage(
+          name: Root.routeName,
+          page: () => Root(),
+        ),
+        GetPage(
           name: LoginScreen.routeName,
           page: () => LoginScreen(),
           binding: LoginBinding(),
@@ -33,7 +45,7 @@ class MyApp extends StatelessWidget {
           binding: SignupBinding(),
         )
       ],
-      initialRoute: LoginScreen.routeName,
+      initialRoute: Root.routeName,
     );
   }
 }

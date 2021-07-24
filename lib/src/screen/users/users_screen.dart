@@ -13,7 +13,8 @@ class UsersScreen extends StatelessWidget {
       body: GetX<UsersController>(
         init: UsersController(),
         builder: (controller) {
-          return ListView.builder(
+          return ListView.separated(
+            separatorBuilder: (context, index) => Divider(),
             itemCount: controller.users.length,
             itemBuilder: (BuildContext context, int index) {
               final user = controller.users[index];
@@ -38,9 +39,14 @@ class UserCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: Colors.grey,
-        backgroundImage: AssetImage("assets/images/defaultDark.png"),
+      leading: Hero(
+        tag: user.uid,
+        child: CircleAvatar(
+          backgroundColor: Colors.grey,
+          backgroundImage: user.imageUrl.isEmpty
+              ? Image.asset("assets/images/defaultDark.png").image
+              : NetworkImage(user.imageUrl),
+        ),
       ),
       title: Text(user.name),
       onTap: () {
@@ -49,3 +55,5 @@ class UserCell extends StatelessWidget {
     );
   }
 }
+
+// AssetImage("assets/images/defaultDark.png")

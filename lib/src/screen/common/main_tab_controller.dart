@@ -35,23 +35,9 @@ class MainTabController extends GetxController {
     super.onInit();
   }
 
-  // @override
-  // void onReady() async {
-  //   super.onReady();
-  //   await checkuser();
-  // }
-
   @override
   void onClose() {
     super.onClose();
-  }
-
-  checkuser() async {
-    if (auth.currentUser == null) {
-      await auth.setCurrentUser();
-      update();
-      print("Call");
-    }
   }
 
   void setIndex(int value) {

@@ -91,14 +91,18 @@ class SignUpScreen extends GetView<SignUpController> {
                         key: _formKey,
                         child: Column(
                           children: [
-                            CircleImageButton(
-                              imageProvider: controller.userImage == null
-                                  ? Image.asset("assets/images/defaultDark.png")
-                                      .image
-                                  : FileImage(controller.userImage!),
-                              onTap: () {
-                                controller.selectImage();
-                              },
+                            Obx(
+                              () => CircleImageButton(
+                                imageProvider: controller.userImage.value ==
+                                        null
+                                    ? Image.asset(
+                                            "assets/images/defaultDark.png")
+                                        .image
+                                    : FileImage(controller.userImage.value!),
+                                onTap: () {
+                                  controller.selectImage();
+                                },
+                              ),
                             ),
                             SizedBox(
                               height: 20.0,

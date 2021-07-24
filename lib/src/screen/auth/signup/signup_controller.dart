@@ -8,6 +8,7 @@ import 'package:getx_chat/src/model/fb_user.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
 import 'package:getx_chat/src/screen/widgets/custom_dialog.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
+import 'package:getx_chat/src/utils/storageSearvice.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -23,7 +24,7 @@ class SignUpController extends GetxController {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  File? userImage;
+  Rxn<File> userImage = Rxn<File>();
 
   final authControllr = Get.find<AuthController>();
 
@@ -36,13 +37,13 @@ class SignUpController extends GetxController {
   RxBool isLoading = false.obs;
 
   Future<void> register() async {
-    isLoading.value = true;
-
-    if (userImage == null) {
+    if (userImage.value == null) {
       Exception error = Exception("No Image");
       showError(error);
       return;
     }
+
+    isLoading.value = true;
 
     try {
       UserCredential _credentiol = await _auth.createUserWithEmailAndPassword(
@@ -50,10 +51,17 @@ class SignUpController extends GetxController {
 
       if (_credentiol.user != null) {
         final _uid = _credentiol.user!.uid;
+
+        String _imageUrl = await StorageSeavice.uploadStorage(
+            StorageRef.profile, "$_uid", userImage.value!);
+
+        print(_imageUrl);
+
         FBUser user = FBUser(
           uid: _uid,
           name: _name,
           email: _email,
+          imageUrl: _imageUrl,
         );
         await firebaseRef(FirebaseRef.user).doc(_uid).set(user.toMap());
 
@@ -84,7 +92,7 @@ class SignUpController extends GetxController {
         ),
       );
       final File file = await getImageFileFromAssets(results.first);
-      userImage = file;
+      userImage.value = file;
     } catch (e) {
       showError(e);
     }

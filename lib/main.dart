@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
       defaultTransition: Transition.cupertino,
       transitionDuration: Duration(milliseconds: 230),
       theme: ThemeData(
+        appBarTheme: AppBarTheme(backgroundColor: Colors.grey),
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
         scaffoldBackgroundColor: Colors.grey[300],

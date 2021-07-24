@@ -91,6 +91,18 @@ class SignUpScreen extends GetView<SignUpController> {
                         key: _formKey,
                         child: Column(
                           children: [
+                            CircleImageButton(
+                              imageProvider: controller.userImage == null
+                                  ? Image.asset("assets/images/defaultDark.png")
+                                      .image
+                                  : FileImage(controller.userImage!),
+                              onTap: () {
+                                controller.selectImage();
+                              },
+                            ),
+                            SizedBox(
+                              height: 20.0,
+                            ),
                             CustomTextField(
                               controller: controller.nameTextControlller,
                               labelText: "name",

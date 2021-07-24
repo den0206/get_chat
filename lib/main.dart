@@ -57,6 +57,7 @@ class MyApp extends StatelessWidget {
         )
       ],
       initialRoute: Root.routeName,
+      // initialRoute: SignUpScreen.routeName,
     );
   }
 }

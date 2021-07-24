@@ -35,11 +35,11 @@ class MainTabController extends GetxController {
     super.onInit();
   }
 
-  @override
-  void onReady() async {
-    super.onReady();
-    await checkuser();
-  }
+  // @override
+  // void onReady() async {
+  //   super.onReady();
+  //   await checkuser();
+  // }
 
   @override
   void onClose() {

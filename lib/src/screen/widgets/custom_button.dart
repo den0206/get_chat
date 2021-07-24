@@ -47,3 +47,37 @@ class CustomButton extends StatelessWidget {
     );
   }
 }
+
+class CircleImageButton extends StatelessWidget {
+  const CircleImageButton({
+    Key? key,
+    required this.imageProvider,
+    required this.onTap,
+    this.width = 120,
+    this.height = 120,
+  }) : super(key: key);
+
+  final ImageProvider<Object> imageProvider;
+
+  final Function() onTap;
+  final double width;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+        elevation: 4,
+        shape: CircleBorder(),
+        clipBehavior: Clip.hardEdge,
+        color: Colors.transparent,
+        child: Ink.image(
+          image: imageProvider,
+          fit: BoxFit.fill,
+          width: 120.0,
+          height: 120.0,
+          child: InkWell(
+            onTap: onTap,
+          ),
+        ));
+  }
+}

@@ -3,6 +3,7 @@ import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:get/get.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
 import 'package:getx_chat/src/screen/home/home_screen.dart';
+import 'package:getx_chat/src/screen/recent/recents_screen.dart';
 import 'package:getx_chat/src/screen/users/users_screen.dart';
 
 class MainTabController extends GetxController {
@@ -11,6 +12,10 @@ class MainTabController extends GetxController {
   var currentIndex = 0;
 
   final bottomItems = [
+    BottomNavigationBarItem(
+      label: "Chats",
+      icon: Icon(Icons.message),
+    ),
     BottomNavigationBarItem(
       label: "Home",
       icon: Icon(
@@ -26,6 +31,7 @@ class MainTabController extends GetxController {
   ];
 
   final List<Widget> pages = [
+    RecentsScreen(),
     HomeScreen(),
     UsersScreen(),
   ];

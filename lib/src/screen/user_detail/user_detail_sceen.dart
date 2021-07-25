@@ -86,7 +86,7 @@ class UserDetailScreen extends GetView<UserDetailController> {
                                   title: "Chat",
                                   background: Colors.green,
                                   onPressed: () {
-                                    controller.createRecents();
+                                    controller.startPrivateChat();
                                   },
                                 )
                               ],

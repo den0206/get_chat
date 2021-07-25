@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
           name: UserDetailScreen.routeName,
           page: () => UserDetailScreen(),
           binding: UserDetailBinding(),
-        )
+        ),
       ],
       initialRoute: Root.routeName,
       // initialRoute: SignUpScreen.routeName,

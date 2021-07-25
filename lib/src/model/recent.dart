@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:getx_chat/src/model/fb_user.dart';
+import 'package:getx_chat/src/utils/date_format.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
 
 class Recent {
@@ -13,7 +14,11 @@ class Recent {
 
   final Timestamp date;
 
-  FBUser? withUser;
+  late FBUser withUser;
+
+  String get formattedTime {
+    return DateFormatter().getVerboseDateTimeRepresentation(date.toDate());
+  }
 
   Recent({
     required this.id,
@@ -36,14 +41,14 @@ class Recent {
       date: map[RecentKey.date],
     );
 
-    firebaseRef(FirebaseRef.user).doc(map[RecentKey.withUserId]).get().then(
-      (doc) {
-        final user = FBUser.fromMap(doc);
-        rec.withUser = user;
-        print(rec.withUser);
-        return rec;
-      },
-    );
+    // firebaseRef(FirebaseRef.user).doc(map[RecentKey.withUserId]).get().then(
+    //   (doc) {
+    //     final user = FBUser.fromMap(doc);
+    //     rec.withUser = user;
+    //     print(rec.withUser);
+    //     return rec;
+    //   },
+    // );
 
     return rec;
   }

@@ -20,6 +20,7 @@ dependencies:
   get: ^4.2.4
   image_picker: ^0.8.2
   multi_image_picker: ^4.8.1
+  uuid: ^3.0.4
 
 dev_dependencies:
   flutter_test:

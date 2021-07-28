@@ -20,14 +20,14 @@ class MessageScreen extends GetView<MessageController> {
         children: [
           Padding(
             padding: EdgeInsets.only(bottom: kBottomNavigationBarHeight),
-            child: ListView.builder(
-              controller: controller.scrollController,
-              itemCount: controller.messages.length,
-              itemBuilder: (context, index) {
-                final message = controller.messages[index];
-                return MessageCell(message: message);
-              },
-            ),
+            child: Obx(() => ListView.builder(
+                  controller: controller.scrollController,
+                  itemCount: controller.messages.length,
+                  itemBuilder: (context, index) {
+                    final message = controller.messages[index];
+                    return MessageCell(message: message);
+                  },
+                )),
           ),
           Align(
             alignment: Alignment.bottomLeft,
@@ -107,7 +107,7 @@ class MessageCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: context.width - 200,
+      // width: context.width - 200,
       margin: EdgeInsets.only(left: 14, right: 14, top: 10, bottom: 10),
       child: Card(
         color: message.isCurrent ? Colors.grey.shade600 : Colors.green,
@@ -116,7 +116,7 @@ class MessageCell extends StatelessWidget {
         ),
         elevation: message.isCurrent ? 10 : 0,
         clipBehavior: Clip.antiAlias,
-        child: InkWell(
+        child: GestureDetector(
           child: Padding(
             padding: EdgeInsets.all(10),
             child: Row(
@@ -151,7 +151,7 @@ class MessageCell extends StatelessWidget {
                         SizedBox(
                           width: 10,
                         ),
-                        Text(message.date.toString())
+                        Text("date")
                       ],
                     ),
                     SizedBox(
@@ -172,7 +172,7 @@ class MessageCell extends StatelessWidget {
   }
 }
 
-class MessageInput extends StatelessWidget {
+class MessageInput extends GetView<MessageController> {
   const MessageInput({Key? key}) : super(key: key);
 
   @override
@@ -202,6 +202,7 @@ class MessageInput extends StatelessWidget {
           ),
           Expanded(
             child: TextField(
+              controller: controller.textControlller,
               decoration: InputDecoration(
                 hintText: "Message...",
                 border: InputBorder.none,
@@ -217,9 +218,15 @@ class MessageInput extends StatelessWidget {
               color: Colors.white,
               size: 18,
             ),
-            backgroundColor: Colors.grey.shade600,
+            backgroundColor: Colors.green,
             elevation: 0,
-            onPressed: () {},
+            onPressed: () {
+              if (controller.textControlller.text.isEmpty) {
+                return null;
+              } else {
+                controller.sendMessage();
+              }
+            },
           )
         ],
       ),

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:get/get.dart';
 import 'package:getx_chat/src/model/fb_user.dart';
+import 'package:getx_chat/src/screen/recent/recents_controller.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
 
 class AuthController extends GetxService {
@@ -43,6 +44,7 @@ class AuthController extends GetxService {
     try {
       user.value = null;
       currentUser = null;
+      RecentsController.to.recents.clear();
       print(currentUser);
       await auth.signOut();
     } catch (e) {

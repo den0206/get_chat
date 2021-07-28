@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/widgets.dart';
+import 'package:getx_chat/src/model/fb_user.dart';
 
 enum FirebaseRef {
   user,
@@ -21,4 +23,12 @@ extension FirebaseRefExtension on FirebaseRef {
 
 CollectionReference firebaseRef(FirebaseRef ref) {
   return FirebaseFirestore.instance.collection(ref.path);
+}
+
+ImageProvider getUserImage(FBUser user) {
+  if (user.imageUrl.isEmpty) {
+    return Image.asset("assets/images/defaultDark.png").image;
+  } else {
+    return NetworkImage(user.imageUrl);
+  }
 }

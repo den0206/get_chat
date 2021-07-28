@@ -6,6 +6,8 @@ import 'package:getx_chat/src/screen/auth/login/login_screen.dart';
 import 'package:getx_chat/src/screen/auth/signup/signup_controller.dart';
 import 'package:getx_chat/src/screen/auth/signup/signup_screen.dart';
 import 'package:getx_chat/src/screen/home/home_screen.dart';
+import 'package:getx_chat/src/screen/message/message_Controller.dart';
+import 'package:getx_chat/src/screen/message/message_screen.dart';
 import 'package:getx_chat/src/screen/root.dart';
 import 'package:getx_chat/src/screen/user_detail/user_detail_controller.dart';
 import 'package:getx_chat/src/screen/user_detail/user_detail_sceen.dart';
@@ -56,7 +58,12 @@ class MyApp extends StatelessWidget {
           page: () => UserDetailScreen(),
           binding: UserDetailBinding(),
         ),
+        GetPage(
+            name: MessageScreen.routeName,
+            page: () => MessageScreen(),
+            binding: MessageBinding())
       ],
+
       initialRoute: Root.routeName,
       // initialRoute: SignUpScreen.routeName,
     );

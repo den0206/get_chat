@@ -9,10 +9,23 @@ class RecentsController extends GetxController {
   final AuthController auth = Get.find();
   final recents = <Recent>[].obs;
 
+  static RecentsController get to => Get.find();
+
   @override
   void onInit() {
     super.onInit();
-    recents.bindStream(toRelation());
+  }
+
+  @override
+  void onClose() {
+    recents.clear();
+    // recents.close();
+    print("DELETE");
+    super.onClose();
+  }
+
+  void loadRecents() {
+    if (recents.isEmpty) recents.bindStream(toRelation());
   }
 
   Stream<List<Recent>> toDoStream() {
@@ -35,16 +48,16 @@ class RecentsController extends GetxController {
         .snapshots();
 
     await for (var recentSnapshot in q) {
-      for (var doc in recentSnapshot.docs) {
+      for (var doc in recentSnapshot.docChanges) {
         Recent recent;
-        if (doc[RecentKey.withUserId] != null) {
+        if (doc.doc[RecentKey.withUserId] != null) {
           var userSnapshot = await firebaseRef(FirebaseRef.user)
-              .doc(doc[RecentKey.withUserId])
+              .doc(doc.doc[RecentKey.withUserId])
               .get();
-          recent = Recent.fromMap(doc);
+          recent = Recent.fromMap(doc.doc);
           recent.withUser = FBUser.fromMap(userSnapshot);
         } else {
-          recent = Recent.fromMap(doc);
+          recent = Recent.fromMap(doc.doc);
         }
         recents.add(recent);
       }

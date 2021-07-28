@@ -7,7 +7,7 @@ import 'package:getx_chat/src/screen/recent/recents_controller.dart';
 import 'package:get/get.dart';
 
 class RecentsScreen extends StatelessWidget {
-  const RecentsScreen({Key? key}) : super(key: key);
+  RecentsScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +17,8 @@ class RecentsScreen extends StatelessWidget {
       ),
       body: GetX<RecentsController>(
         init: RecentsController(),
+        initState: (state) => RecentsController.to.loadRecents(),
+        autoRemove: false,
         builder: (controller) {
           return ListView.separated(
             separatorBuilder: (context, index) => Divider(),
@@ -53,9 +55,8 @@ class RecentCell extends StatelessWidget {
       title: Text(recent.withUser.name),
       trailing: Text(recent.formattedTime),
       onTap: () {
-        Get.to(MessageScreen(
-          chatRooId: recent.chatRoomId,
-        ));
+        final argumants = [recent.chatRoomId, recent.withUser];
+        Get.toNamed(MessageScreen.routeName, arguments: argumants);
       },
     );
   }

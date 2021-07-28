@@ -3,6 +3,8 @@ import 'package:getx_chat/src/model/fb_user.dart';
 import 'package:get/get.dart';
 import 'package:getx_chat/src/model/recent.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
+import 'package:getx_chat/src/screen/common/main_tab_controller.dart';
+import 'package:getx_chat/src/screen/message/message_screen.dart';
 
 class UserDetailBinding implements Bindings {
   @override
@@ -29,8 +31,12 @@ class UserDetailController extends GetxController {
 
     final chatRoomId =
         await createChatRoom(current.uid, user.uid, [current, user]);
-    print(chatRoomId);
 
+    /// present message screen
     Get.back();
+    Get.find<MainTabController>().setIndex(0);
+
+    final arguments = [chatRoomId, user];
+    Get.toNamed(MessageScreen.routeName, arguments: arguments);
   }
 }

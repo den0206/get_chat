@@ -21,7 +21,8 @@ class MessageScreen extends GetView<MessageController> {
           Padding(
             padding: EdgeInsets.only(bottom: kBottomNavigationBarHeight),
             child: Obx(() => ListView.builder(
-                  controller: controller.scrollController,
+                  reverse: true,
+                  controller: controller.sC,
                   itemCount: controller.messages.length,
                   itemBuilder: (context, index) {
                     final message = controller.messages[index];
@@ -202,7 +203,7 @@ class MessageInput extends GetView<MessageController> {
           ),
           Expanded(
             child: TextField(
-              controller: controller.textControlller,
+              controller: controller.tC,
               decoration: InputDecoration(
                 hintText: "Message...",
                 border: InputBorder.none,
@@ -221,7 +222,7 @@ class MessageInput extends GetView<MessageController> {
             backgroundColor: Colors.green,
             elevation: 0,
             onPressed: () {
-              if (controller.textControlller.text.isEmpty) {
+              if (controller.tC.text.isEmpty) {
                 return null;
               } else {
                 controller.sendMessage();

@@ -11,7 +11,7 @@ class Message {
   final String userId;
   final Timestamp date;
 
-  final read = false.obs;
+  final bool read;
 
   bool get isCurrent {
     return Get.find<AuthController>().currentUser?.uid == userId;
@@ -23,6 +23,7 @@ class Message {
     required this.text,
     required this.userId,
     required this.date,
+    required this.read,
   });
 
   Map<String, dynamic> toMap() {
@@ -31,17 +32,22 @@ class Message {
       MessageKey.chatRoomId: chatRoomId,
       MessageKey.text: text,
       MessageKey.userId: userId,
-      MessageKey.date: date
+      MessageKey.date: date,
+      MessageKey.read: read,
     };
   }
 
   factory Message.fromMap(DocumentSnapshot<Object?> map) {
     return Message(
-        id: map[MessageKey.id],
-        chatRoomId: map[MessageKey.chatRoomId],
-        text: map[MessageKey.text],
-        userId: map[MessageKey.userId],
-        date: map[MessageKey.date]);
+      id: map[MessageKey.id],
+      chatRoomId: map[MessageKey.chatRoomId],
+      text: map[MessageKey.text],
+      userId: map[MessageKey.userId],
+      date: map[MessageKey.date],
+      read: (map.data() as Map<String, dynamic>).containsKey(MessageKey.read)
+          ? map[MessageKey.read]
+          : false,
+    );
   }
 }
 

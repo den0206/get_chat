@@ -45,19 +45,80 @@ class RecentCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: Colors.grey,
-        backgroundImage: recent.withUser.imageUrl.isEmpty
-            ? Image.asset("assets/images/defaultDark.png").image
-            : NetworkImage(recent.withUser.imageUrl),
-      ),
-      title: Text(recent.withUser.name),
-      trailing: Text(recent.formattedTime),
+    return InkWell(
       onTap: () {
         final argumants = [recent.chatRoomId, recent.withUser];
         Get.toNamed(MessageScreen.routeName, arguments: argumants);
       },
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 28,
+              backgroundColor: Colors.grey,
+              backgroundImage: recent.withUser.imageUrl.isEmpty
+                  ? Image.asset("assets/images/defaultDark.png").image
+                  : NetworkImage(recent.withUser.imageUrl),
+            ),
+            SizedBox(
+              width: 20,
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  recent.withUser.name,
+                  style: TextStyle(
+                    color: Color(0xff686795),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                Text(
+                  recent.lastMessage,
+                  style: TextStyle(
+                      color: Color(0xffAEABC9),
+                      fontSize: 14,
+                      letterSpacing: 1.2,
+                      fontWeight: FontWeight.w500),
+                )
+              ],
+            ),
+            Spacer(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                CircleAvatar(
+                  radius: 8,
+                  backgroundColor: Color(0xffEE1D1D),
+                  child: Text(
+                    recent.counter.toString(),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  recent.formattedTime,
+                  style: TextStyle(
+                    color: Color(0xffAEABC9),
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

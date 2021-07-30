@@ -29,7 +29,7 @@ class MessageController extends GetxController {
   final int limit = 10;
 
   final messages = <Message>[].obs;
-  final RxBool isloading = false.obs;
+  bool isloading = false;
 
   DocumentSnapshot? lastDoc;
   List<StreamSubscription<QuerySnapshot>> streams = [];
@@ -58,7 +58,7 @@ class MessageController extends GetxController {
       return;
     }
 
-    isloading.value = true;
+    isloading = true;
 
     try {
       Query ref;
@@ -67,25 +67,27 @@ class MessageController extends GetxController {
         ref = firebaseRef(FirebaseRef.message)
             .doc(currentUser.uid)
             .collection(chatRoomId)
-            .orderBy(MessageKey.date, descending: false)
+            .orderBy(MessageKey.date, descending: true)
             .limit(limit);
       } else {
+        print("More");
         ref = firebaseRef(FirebaseRef.message)
             .doc(currentUser.uid)
             .collection(chatRoomId)
-            .orderBy(MessageKey.date, descending: false)
+            .orderBy(MessageKey.date, descending: true)
             .startAfterDocument(lastDoc!)
             .limit(limit);
       }
 
       final snapshots = await ref.get();
 
-      if (snapshots.docs.length > limit) {
+      if (snapshots.docs.length < limit) {
         reachLast = true;
       }
       if (snapshots.docs.isEmpty) {
         return;
       }
+
       List<Message> temp = [];
 
       lastDoc = snapshots.docs.last;
@@ -95,6 +97,9 @@ class MessageController extends GetxController {
         (doc) {
           final Message message = Message.fromMap(doc);
 
+          // if (message.isCurrent) {
+          //   updateReadStatus(message);
+          // }
           temp.add(message);
         },
       );
@@ -102,15 +107,23 @@ class MessageController extends GetxController {
       messages.addAll(temp);
 
       List<String> unReadMessages = temp
-          .where((message) => message.read == false && message.isCurrent)
+          .where((message) => !message.read && message.isCurrent)
           .map((e) => e.id)
           .toList();
 
+      messages.forEach(
+        (message) {
+          if (!message.isCurrent) {
+            updateReadStatus(message);
+          }
+        },
+      );
+
       readListner(unReadMessages);
     } catch (e) {
-      print(showError(e));
+      showError(e);
     } finally {
-      isloading.value = false;
+      isloading = false;
     }
   }
 
@@ -154,7 +167,10 @@ class MessageController extends GetxController {
       curve: Curves.easeIn,
     );
   }
+}
 
+extension MessageControllerExtension on MessageController {
+  /// listner
   void newChatListner() {
     final _subscription = firebaseRef(FirebaseRef.message)
         .doc(currentUser.uid)
@@ -171,6 +187,10 @@ class MessageController extends GetxController {
               if (!messages.contains(message)) {
                 print("add");
                 messages.insert(0, message);
+
+                if (!message.isCurrent && !message.read) {
+                  updateReadStatus(message);
+                }
               }
             }
           },
@@ -182,6 +202,10 @@ class MessageController extends GetxController {
   }
 
   void readListner(List<String> unreads) {
+    if (unreads.isEmpty) {
+      return;
+    }
+
     final _subscription = firebaseRef(FirebaseRef.message)
         .doc(currentUser.uid)
         .collection(chatRoomId)
@@ -207,23 +231,34 @@ class MessageController extends GetxController {
     streams.add(_subscription);
     print(streams.length);
   }
-}
 
-// Stream<List<Message>> toDoStream() {
-//   return firebaseRef(FirebaseRef.message)
-//       .doc(currentUser.uid)
-//       .collection(chatRoomId)
-//       .orderBy(MessageKey.date, descending: false)
-//       .limit(limit)
-//       .snapshots()
-//       .map(
-//     (q) {
-//       return q.docs.map((doc) {
-//         return Message.fromMap(doc);
-//       }).toList();
-//     },
-//   );
-// }
+  void updateReadStatus(Message tempMessage) {
+    final users = [currentUser, withUser];
+
+    if (!tempMessage.read) {
+      final data = {MessageKey.read: true};
+      int indexWhere = messages.indexWhere((message) {
+        return tempMessage.id == message.id;
+      });
+
+      messages[indexWhere].read = true;
+
+      users.forEach(
+        (user) {
+          firebaseRef(FirebaseRef.message)
+              .doc(user.uid)
+              .collection(chatRoomId)
+              .doc(tempMessage.id)
+              .set(
+                data,
+                SetOptions(merge: true),
+              )
+              .then((value) => print("Read"));
+        },
+      );
+    }
+  }
+}
 
 // if (messageChange.type == DocumentChangeType.removed) {
 //   messages.removeWhere((message) {
@@ -231,3 +266,17 @@ class MessageController extends GetxController {
 //   });
 //   isChange = true;
 // }
+
+// Get.snackbar(
+//   "Loading...",
+//   "Please Wait...",
+//   icon: Icon(Icons.person, color: Colors.white),
+//   snackPosition: SnackPosition.TOP,
+//   backgroundColor: Colors.green,
+//   borderRadius: 20,
+//   margin: EdgeInsets.all(15),
+//   shouldIconPulse: true,
+//   barBlur: 20,
+//   isDismissible: true,
+//   duration: Duration(seconds: 1),
+// );

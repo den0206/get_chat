@@ -20,7 +20,7 @@ class DateFormatter {
     if (localDateTime.day == yesterday.day &&
         localDateTime.month == now.month &&
         localDateTime.year == now.year) {
-      return "yYsterday";
+      return "Yesterday";
     }
     if (now.difference(localDateTime).inDays < 4) {
       String weekday = DateFormat('EEEE').format(localDateTime);

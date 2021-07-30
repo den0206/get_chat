@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:get/instance_manager.dart';
 
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
+import 'package:getx_chat/src/utils/date_format.dart';
 
 class Message {
   final String id;
@@ -11,7 +12,11 @@ class Message {
   final String userId;
   final Timestamp date;
 
-  final bool read;
+  bool read;
+
+  String get formattedTime {
+    return DateFormatter().getVerboseDateTimeRepresentation(date.toDate());
+  }
 
   bool get isCurrent {
     return Get.find<AuthController>().currentUser?.uid == userId;

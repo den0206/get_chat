@@ -1,3 +1,4 @@
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
@@ -16,10 +17,11 @@ class MessageScreen extends GetView<MessageController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: buildAppBar(),
-      backgroundColor: Colors.green.shade400,
+      backgroundColor: Colors.green[600],
       body: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();
+          controller.setEmoji(hide: true);
         },
         child: Column(
           children: [
@@ -46,17 +48,57 @@ class MessageScreen extends GetView<MessageController> {
                           if (controller.isloading)
                             return Center(child: Text("Loading..."));
                         }
-                        return MessageCell(
-                            message: message, controller: controller);
+                        return MessageCell(message: message);
                       },
                     )),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 20),
-              child: MessageInput(),
-            ),
+            MessageInput(),
+            _emojiSpace()
           ],
+        ),
+      ),
+    );
+  }
+
+  Obx _emojiSpace() {
+    return Obx(
+      () => Offstage(
+        offstage: !controller.showEmoji.value,
+        child: SizedBox(
+          height: 250,
+          child: EmojiPicker(
+              onEmojiSelected: (category, emoji) {
+                controller.tC
+                  ..text += emoji.emoji
+                  ..selection = TextSelection.fromPosition(
+                      TextPosition(offset: controller.tC.text.length));
+              },
+              onBackspacePressed: () {
+                controller.tC
+                  ..text = controller.tC.text.characters.skipLast(1).toString()
+                  ..selection = TextSelection.fromPosition(
+                      TextPosition(offset: controller.tC.text.length));
+              },
+              config: Config(
+                  columns: 7,
+                  emojiSizeMax: 32.0,
+                  verticalSpacing: 0,
+                  horizontalSpacing: 0,
+                  initCategory: Category.RECENT,
+                  bgColor: Color(0xFFF2F2F2),
+                  indicatorColor: Colors.blue,
+                  iconColor: Colors.grey,
+                  iconColorSelected: Colors.blue,
+                  progressIndicatorColor: Colors.blue,
+                  backspaceColor: Colors.blue,
+                  showRecentsTab: true,
+                  recentsLimit: 28,
+                  noRecentsText: 'No Recents',
+                  noRecentsStyle:
+                      TextStyle(fontSize: 20, color: Colors.black26),
+                  categoryIcons: CategoryIcons(),
+                  buttonMode: ButtonMode.MATERIAL)),
         ),
       ),
     );
@@ -112,15 +154,13 @@ class MessageScreen extends GetView<MessageController> {
   }
 }
 
-class MessageCell extends StatelessWidget {
+class MessageCell extends GetView<MessageController> {
   const MessageCell({
     Key? key,
     required this.message,
-    required this.controller,
   }) : super(key: key);
 
   final Message message;
-  final MessageController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -216,63 +256,71 @@ class MessageInput extends GetView<MessageController> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // height: kBottomNavigationBarHeight,
-      padding: EdgeInsets.symmetric(horizontal: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Expanded(
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 14),
-              height: 60,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.emoji_emotions_outlined,
-                    color: Colors.grey[500],
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: TextField(
-                      controller: controller.tC,
-                      decoration: InputDecoration(
-                        hintText: "Message...",
-                        border: InputBorder.none,
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 20),
+      child: Container(
+        // height: kBottomNavigationBarHeight,
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 14),
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.emoji_emotions_outlined),
+                      color: Colors.grey[500],
+                      onPressed: () {
+                        FocusScope.of(context).unfocus();
+                        controller.setEmoji();
+                      },
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: TextField(
+                        focusNode: controller.fN,
+                        controller: controller.tC,
+                        decoration: InputDecoration(
+                          hintText: "Message...",
+                          border: InputBorder.none,
+                        ),
                       ),
                     ),
-                  ),
-                  Icon(Icons.attach_file, color: Colors.grey[500])
-                ],
+                    Icon(Icons.attach_file, color: Colors.grey[500])
+                  ],
+                ),
               ),
             ),
-          ),
-          SizedBox(
-            width: 16,
-          ),
-          FloatingActionButton(
-            child: Icon(
-              Icons.send,
-              color: Colors.white,
-              size: 18,
+            SizedBox(
+              width: 16,
             ),
-            backgroundColor: Colors.green,
-            elevation: 0,
-            onPressed: () {
-              if (controller.tC.text.isEmpty) {
-                return null;
-              } else {
-                controller.sendMessage();
-              }
-            },
-          ),
-        ],
+            FloatingActionButton(
+              child: Icon(
+                Icons.send,
+                color: Colors.white,
+                size: 18,
+              ),
+              backgroundColor: Colors.green,
+              elevation: 0,
+              onPressed: () {
+                if (controller.tC.text.isEmpty) {
+                  return null;
+                } else {
+                  controller.sendMessage();
+                }
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

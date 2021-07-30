@@ -77,10 +77,13 @@ class RecentCell extends StatelessWidget {
                     letterSpacing: 1.5,
                   ),
                 ),
+                SizedBox(
+                  height: 5,
+                ),
                 Text(
                   recent.lastMessage,
                   style: TextStyle(
-                      color: Color(0xffAEABC9),
+                      color: Colors.black,
                       fontSize: 14,
                       letterSpacing: 1.2,
                       fontWeight: FontWeight.w500),
@@ -91,17 +94,18 @@ class RecentCell extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                CircleAvatar(
-                  radius: 8,
-                  backgroundColor: Color(0xffEE1D1D),
-                  child: Text(
-                    recent.counter.toString(),
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold),
+                if (recent.counter != 0)
+                  CircleAvatar(
+                    radius: 15,
+                    backgroundColor: Color(0xffEE1D1D),
+                    child: Text(
+                      recent.counter.toString(),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
-                ),
                 SizedBox(
                   height: 10,
                 ),

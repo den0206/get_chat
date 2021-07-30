@@ -8,6 +8,7 @@ import 'package:get/state_manager.dart';
 import 'package:get/get.dart';
 import 'package:getx_chat/src/model/fb_user.dart';
 import 'package:getx_chat/src/model/message.dart';
+import 'package:getx_chat/src/model/recent.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
 import 'package:getx_chat/src/screen/widgets/custom_dialog.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
@@ -31,10 +32,13 @@ class MessageController extends GetxController {
   final messages = <Message>[].obs;
   bool isloading = false;
 
+  final RxBool showEmoji = false.obs;
+
   DocumentSnapshot? lastDoc;
   List<StreamSubscription<QuerySnapshot>> streams = [];
   bool reachLast = false;
 
+  final FocusNode fN = FocusNode();
   final TextEditingController tC = TextEditingController();
   final ScrollController sC = ScrollController();
 
@@ -42,12 +46,15 @@ class MessageController extends GetxController {
   void onInit() {
     super.onInit();
 
+    listenFocus();
+
     newChatListner();
     loadMessage();
   }
 
   @override
   void onClose() {
+    fN.dispose();
     sC.dispose();
     for (final stream in streams) stream.cancel();
     super.onClose();
@@ -70,6 +77,7 @@ class MessageController extends GetxController {
             .orderBy(MessageKey.date, descending: true)
             .limit(limit);
       } else {
+        await Future.delayed(Duration(seconds: 2));
         print("More");
         ref = firebaseRef(FirebaseRef.message)
             .doc(currentUser.uid)
@@ -97,9 +105,6 @@ class MessageController extends GetxController {
         (doc) {
           final Message message = Message.fromMap(doc);
 
-          // if (message.isCurrent) {
-          //   updateReadStatus(message);
-          // }
           temp.add(message);
         },
       );
@@ -113,7 +118,7 @@ class MessageController extends GetxController {
 
       messages.forEach(
         (message) {
-          if (!message.isCurrent) {
+          if (!message.isCurrent && !message.read) {
             updateReadStatus(message);
           }
         },
@@ -135,11 +140,12 @@ class MessageController extends GetxController {
     FocusScope.of(Get.context!).unfocus();
     final users = [currentUser, withUser];
     final messageId = Uuid().v4();
+    final text = tC.text;
 
     final Message message = Message(
       id: messageId,
       chatRoomId: chatRoomId,
-      text: tC.text,
+      text: text,
       userId: currentUser.uid,
       date: Timestamp.now(),
       read: false,
@@ -154,10 +160,10 @@ class MessageController extends GetxController {
             .set(message.toMap());
       },
     );
-
     tC.clear();
 
     _scrollToBottom();
+    await updateRecent(chatRoomId, text);
   }
 
   void _scrollToBottom() {
@@ -170,7 +176,24 @@ class MessageController extends GetxController {
 }
 
 extension MessageControllerExtension on MessageController {
+  void setEmoji({bool hide = false}) {
+    if (hide) {
+      if (showEmoji.value) showEmoji.value = false;
+    } else {
+      showEmoji.value = !showEmoji.value;
+    }
+  }
+
   /// listner
+
+  void listenFocus() {
+    return fN.addListener(() {
+      if (fN.hasFocus) {
+        if (showEmoji.value) showEmoji.value = false;
+      }
+    });
+  }
+
   void newChatListner() {
     final _subscription = firebaseRef(FirebaseRef.message)
         .doc(currentUser.uid)

@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:getx_chat/src/model/fb_user.dart';
+import 'package:getx_chat/src/screen/auth/auth_controller.dart';
 import 'package:getx_chat/src/utils/date_format.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
+import 'package:get/get.dart';
 
 class Recent {
   final String id;
@@ -133,4 +135,37 @@ void createRecentFirestore(
   };
 
   ref.set(data);
+}
+
+Future<void> updateRecent(String chatRoomId, String lastMessage) async {
+  final q = await firebaseRef(FirebaseRef.recent)
+      .where(RecentKey.chatRoomId, isEqualTo: chatRoomId)
+      .get();
+
+  if (q.docs.isNotEmpty)
+    q.docs.forEach(
+      (doc) {
+        final recent = Recent.fromMap(doc);
+        updateRecentToFirestore(recent, lastMessage);
+      },
+    );
+}
+
+void updateRecentToFirestore(Recent recent, String lastMessage) {
+  final date = Timestamp.now();
+  final uid = recent.userId;
+  final currentUid = Get.find<AuthController>().current.uid;
+  var counter = recent.counter;
+
+  if (currentUid != uid) {
+    counter += 1;
+  }
+
+  final value = {
+    RecentKey.lastMessage: lastMessage,
+    RecentKey.counter: counter,
+    RecentKey.date: date
+  };
+
+  firebaseRef(FirebaseRef.recent).doc(recent.id).update(value);
 }

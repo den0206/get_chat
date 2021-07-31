@@ -46,7 +46,10 @@ class MessageScreen extends GetView<MessageController> {
                         if (index == controller.messages.length - 1) {
                           controller.loadMessage();
                           if (controller.isloading)
-                            return Center(child: Text("Loading..."));
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              child: Center(child: Text("Loading...")),
+                            );
                         }
                         return MessageCell(message: message);
                       },
@@ -167,6 +170,7 @@ class MessageCell extends GetView<MessageController> {
     return Container(
       margin: EdgeInsets.only(top: 10),
       child: Column(
+        // crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: message.isCurrent
@@ -224,12 +228,15 @@ class MessageCell extends GetView<MessageController> {
                   SizedBox(
                     width: 40,
                   ),
-                if (message.read)
-                  Icon(
-                    Icons.done_all,
-                    size: 20,
-                    color: Color(0xffAEABC9),
-                  ),
+                message.read && message.isCurrent
+                    ? Icon(
+                        Icons.done_all,
+                        size: 20,
+                        color: Color(0xffAEABC9),
+                      )
+                    : SizedBox(
+                        width: 50,
+                      ),
                 SizedBox(
                   width: 8,
                 ),
@@ -295,7 +302,12 @@ class MessageInput extends GetView<MessageController> {
                         ),
                       ),
                     ),
-                    Icon(Icons.attach_file, color: Colors.grey[500])
+                    IconButton(
+                      onPressed: () {
+                        controller.showFileShhet();
+                      },
+                      icon: Icon(Icons.attach_file, color: Colors.grey[500]),
+                    )
                   ],
                 ),
               ),

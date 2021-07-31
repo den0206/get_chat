@@ -16,10 +16,7 @@ class Root extends StatelessWidget {
       init: AuthController(),
       builder: (controller) {
         if (controller.user.value != null) {
-          // if (controller.currentUser != null) {
-          //   return MainTabScreen();
-          // }
-
+        
           return FutureBuilder(
             future: controller.setCurrentUser(),
             builder: (context, snapshot) {

@@ -66,6 +66,14 @@ class Recent {
       RecentKey.date: date,
     };
   }
+
+  Future<void> onUserCallback(Function(FBUser user) onScucess) async {
+    final doc = await firebaseRef(FirebaseRef.user).doc(this.withUserId).get();
+
+    final user = FBUser.fromMap(doc);
+
+    onScucess(user);
+  }
 }
 
 class RecentKey {

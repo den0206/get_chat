@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:getx_chat/src/screen/auth/login/login_screen.dart';
 import 'package:getx_chat/src/screen/auth/signup/signup_controller.dart';
 import 'package:getx_chat/src/screen/auth/signup/signup_screen.dart';
+import 'package:getx_chat/src/screen/network_branch.dart/network_branch.dart';
 import 'package:getx_chat/src/screen/home/home_screen.dart';
 import 'package:getx_chat/src/screen/message/message_Controller.dart';
 import 'package:getx_chat/src/screen/message/message_screen.dart';
@@ -36,6 +37,10 @@ class MyApp extends StatelessWidget {
       ),
       getPages: [
         GetPage(
+          name: NetworkBranch.routeName,
+          page: () => NetworkBranch(),
+        ),
+        GetPage(
           name: Root.routeName,
           page: () => Root(),
         ),
@@ -64,7 +69,7 @@ class MyApp extends StatelessWidget {
             binding: MessageBinding())
       ],
 
-      initialRoute: Root.routeName,
+      initialRoute: NetworkBranch.routeName,
       // initialRoute: SignUpScreen.routeName,
     );
   }

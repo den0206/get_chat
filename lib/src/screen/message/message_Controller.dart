@@ -12,6 +12,7 @@ import 'package:getx_chat/src/model/recent.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
 import 'package:getx_chat/src/screen/widgets/custom_dialog.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
+import 'package:getx_chat/src/utils/image_extension.dart';
 import 'package:uuid/uuid.dart';
 
 class MessageBinding extends Bindings {
@@ -64,7 +65,6 @@ class MessageController extends GetxController {
     if (reachLast) {
       return;
     }
-
     isloading = true;
 
     try {
@@ -99,7 +99,6 @@ class MessageController extends GetxController {
       List<Message> temp = [];
 
       lastDoc = snapshots.docs.last;
-      print(lastDoc);
 
       snapshots.docs.forEach(
         (doc) {
@@ -182,6 +181,39 @@ extension MessageControllerExtension on MessageController {
     } else {
       showEmoji.value = !showEmoji.value;
     }
+  }
+
+  void showFileShhet() {
+    Get.bottomSheet(
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(Icons.videocam),
+              title: Text('Camera'),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: Icon(Icons.camera),
+              title: Text('Gallary'),
+              onTap: () async {
+                final a = await ImageExtension.selectImage();
+                Get.back();
+                print(a);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.close),
+              title: Text('Cancel'),
+              onTap: () => Get.back(),
+            ),
+          ],
+        ),
+      ),
+      backgroundColor: Colors.white,
+    );
   }
 
   /// listner
@@ -282,24 +314,3 @@ extension MessageControllerExtension on MessageController {
     }
   }
 }
-
-// if (messageChange.type == DocumentChangeType.removed) {
-//   messages.removeWhere((message) {
-//     return messageChange.doc.id == message.id;
-//   });
-//   isChange = true;
-// }
-
-// Get.snackbar(
-//   "Loading...",
-//   "Please Wait...",
-//   icon: Icon(Icons.person, color: Colors.white),
-//   snackPosition: SnackPosition.TOP,
-//   backgroundColor: Colors.green,
-//   borderRadius: 20,
-//   margin: EdgeInsets.all(15),
-//   shouldIconPulse: true,
-//   barBlur: 20,
-//   isDismissible: true,
-//   duration: Duration(seconds: 1),
-// );

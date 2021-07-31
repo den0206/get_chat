@@ -18,8 +18,10 @@ dependencies:
   firebase_auth: ^1.1.2
   firebase_core: ^1.1.0
   firebase_storage: ^10.0.1
+  flutter_slidable: ^0.6.0
   get: ^4.2.4
   image_picker: ^0.8.2
+  internet_connection_checker: ^0.0.1+2
   multi_image_picker: ^4.8.1
   uuid: ^3.0.4
 

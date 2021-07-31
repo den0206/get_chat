@@ -8,9 +8,8 @@ import 'package:getx_chat/src/model/fb_user.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
 import 'package:getx_chat/src/screen/widgets/custom_dialog.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
+import 'package:getx_chat/src/utils/image_extension.dart';
 import 'package:getx_chat/src/utils/storageSearvice.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 
 class SignupBinding extends Bindings {
   @override
@@ -77,37 +76,7 @@ class SignUpController extends GetxController {
   }
 
   Future<void> selectImage() async {
-    List<Asset> results = <Asset>[];
-    try {
-      results = await MultiImagePicker.pickImages(
-        maxImages: 1,
-        selectedAssets: results,
-        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
-        materialOptions: MaterialOptions(
-          actionBarColor: "#abcdef",
-          actionBarTitle: "Example App",
-          allViewTitle: "All Photos",
-          useDetailsView: false,
-          selectCircleStrokeColor: "#000000",
-        ),
-      );
-      final File file = await getImageFileFromAssets(results.first);
-      userImage.value = file;
-    } catch (e) {
-      showError(e);
-    }
-  }
-
-  Future<File> getImageFileFromAssets(Asset asset) async {
-    final byteData = await asset.getByteData();
-
-    final tempFile =
-        File("${(await getTemporaryDirectory()).path}/${asset.name}");
-    final file = await tempFile.writeAsBytes(
-      byteData.buffer
-          .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes),
-    );
-
-    return file;
+    final file = await ImageExtension.selectImage();
+    userImage.value = file;
   }
 }

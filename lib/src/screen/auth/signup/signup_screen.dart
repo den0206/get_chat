@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:getx_chat/src/screen/auth/login/login_screen.dart';
 import 'package:getx_chat/src/screen/auth/signup/signup_controller.dart';
 import 'package:getx_chat/src/screen/widgets/custom_button.dart';
 import 'package:getx_chat/src/screen/widgets/custom_textfield.dart';
@@ -159,7 +158,7 @@ class SignUpScreen extends GetView<SignUpController> {
                             ),
                             TextButton(
                               onPressed: () {
-                                Get.offAndToNamed(LoginScreen.routeName);
+                                Get.back();
                               },
                               child: Text("Login"),
                             )

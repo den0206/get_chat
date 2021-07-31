@@ -19,7 +19,7 @@ class UsersController extends GetxController {
         final List<FBUser> array = [];
         query.docs.forEach(
           (doc) {
-            if (doc.id != current.uid) {
+            if (doc.id != AuthController.to.current.uid) {
               array.add(FBUser.fromMap(doc));
             }
           },

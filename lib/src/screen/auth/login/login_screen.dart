@@ -145,7 +145,8 @@ class LoginScreen extends StatelessWidget {
                             ),
                             TextButton(
                                 onPressed: () {
-                                  Get.offAndToNamed(SignUpScreen.routeName);
+                                  controller.clear();
+                                  Get.toNamed(SignUpScreen.routeName);
                                 },
                                 child: Text("Sign Up"))
                           ],

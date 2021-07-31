@@ -5,6 +5,7 @@ import 'package:get/get_state_manager/get_state_manager.dart';
 
 import 'package:getx_chat/src/model/message.dart';
 import 'package:getx_chat/src/screen/message/message_Controller.dart';
+import 'package:getx_chat/src/screen/user_detail/base_widget.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
 
 class MessageScreen extends GetView<MessageController> {
@@ -18,47 +19,67 @@ class MessageScreen extends GetView<MessageController> {
     return Scaffold(
       appBar: buildAppBar(),
       backgroundColor: Colors.green[600],
-      body: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
-          controller.setEmoji(hide: true);
-        },
+      body: BaseScreen(
         child: Column(
           children: [
             Expanded(
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30),
-                  ),
-                ),
-                child: Obx(() => ListView.builder(
-                      physics: BouncingScrollPhysics(),
-                      reverse: true,
-                      controller: controller.sC,
-                      itemCount: controller.messages.length,
-                      itemBuilder: (context, index) {
-                        final message = controller.messages[index];
+              child: Obx(
+                () => Stack(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30),
+                        ),
+                      ),
+                      child: ListView.builder(
+                        physics: BouncingScrollPhysics(),
+                        reverse: true,
+                        controller: controller.sC,
+                        itemCount: controller.messages.length,
+                        itemBuilder: (context, index) {
+                          final message = controller.messages[index];
 
-                        if (index == controller.messages.length - 1) {
-                          controller.loadMessage();
-                          if (controller.isloading)
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              child: Center(child: Text("Loading...")),
-                            );
-                        }
-                        return MessageCell(message: message);
-                      },
-                    )),
+                          if (index == controller.messages.length - 1) {
+                            controller.loadMessage();
+                            if (controller.isloading)
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: Center(child: Text("Loading...")),
+                              );
+                          }
+                          return MessageCell(message: message);
+                        },
+                      ),
+                    ),
+                    if (controller.showPanel.value ||
+                        controller.showEmoji.value)
+                      _keybordBackground(context),
+                  ],
+                ),
               ),
             ),
             MessageInput(),
             _emojiSpace()
           ],
+        ),
+      ),
+    );
+  }
+
+  GestureDetector _keybordBackground(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+        controller.setEmoji(hide: true);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.4),
         ),
       ),
     );
@@ -327,6 +348,7 @@ class MessageInput extends GetView<MessageController> {
                 if (controller.tC.text.isEmpty) {
                   return null;
                 } else {
+                  FocusScope.of(context).unfocus();
                   controller.sendMessage();
                 }
               },

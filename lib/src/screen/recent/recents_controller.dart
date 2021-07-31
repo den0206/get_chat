@@ -118,6 +118,21 @@ class RecentsController extends GetxController {
     listners.add(_subscription);
   }
 
+  void resetCounter(Recent tempRecent) {
+    final index = recents.indexWhere((recent) => recent.id == tempRecent.id);
+    final oldRecent = recents[index];
+
+    if (oldRecent.counter != 0) {
+      print("Update Counter");
+      tempRecent.counter = 0;
+      recents[index] = tempRecent;
+
+      firebaseRef(FirebaseRef.recent)
+          .doc(tempRecent.id)
+          .update({RecentKey.counter: tempRecent.counter});
+    }
+  }
+
   void deleteRecent(Recent recent) {
     firebaseRef(FirebaseRef.recent).doc(recent.id).delete();
 

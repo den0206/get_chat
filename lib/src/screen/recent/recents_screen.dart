@@ -71,9 +71,12 @@ class RecentCell extends GetView<RecentsController> {
         ),
       ],
       child: InkWell(
-        onTap: () {
+        onTap: () async {
           final argumants = [recent.chatRoomId, recent.withUser];
-          Get.toNamed(MessageScreen.routeName, arguments: argumants);
+          final _ =
+              await Get.toNamed(MessageScreen.routeName, arguments: argumants);
+
+          controller.resetCounter(recent);
         },
         child: Container(
           margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),

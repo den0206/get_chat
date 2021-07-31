@@ -37,6 +37,11 @@ class LoginController extends GetxController {
     super.onClose();
   }
 
+  void clear() {
+    emailController.clear();
+    passwordController.clear();
+  }
+
   Future<void> loginUser() async {
     isLoading.value = true;
 

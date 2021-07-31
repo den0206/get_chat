@@ -12,11 +12,15 @@ class Recent {
   final String withUserId;
   final String chatRoomId;
   final String lastMessage;
-  final int counter;
+  int counter;
 
   final Timestamp date;
 
   late FBUser withUser;
+
+  RxInt tempCounter() {
+    return counter.obs;
+  }
 
   String get formattedTime {
     return DateFormatter().getVerboseDateTimeRepresentation(date.toDate());

@@ -29,8 +29,8 @@ class UserDetailController extends GetxController {
       return;
     }
 
-    final chatRoomId =
-        await createChatRoom(current.uid, user.uid, [current, user]);
+    final chatRoomId = await createChatRoom(AuthController.to.current.uid,
+        user.uid, [AuthController.to.current, user]);
 
     /// present message screen
     Get.back();

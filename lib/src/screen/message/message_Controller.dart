@@ -10,6 +10,7 @@ import 'package:getx_chat/src/model/fb_user.dart';
 import 'package:getx_chat/src/model/message.dart';
 import 'package:getx_chat/src/model/recent.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
+import 'package:getx_chat/src/screen/network_branch.dart/network_branch.dart';
 import 'package:getx_chat/src/screen/widgets/custom_dialog.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
 import 'package:getx_chat/src/utils/image_extension.dart';
@@ -34,6 +35,7 @@ class MessageController extends GetxController {
   bool isloading = false;
 
   final RxBool showEmoji = false.obs;
+  final RxBool showPanel = false.obs;
 
   DocumentSnapshot? lastDoc;
   List<StreamSubscription<QuerySnapshot>> streams = [];
@@ -62,7 +64,7 @@ class MessageController extends GetxController {
   }
 
   Future<void> loadMessage() async {
-    if (reachLast) {
+    if (reachLast || isloading) {
       return;
     }
     isloading = true;
@@ -132,11 +134,10 @@ class MessageController extends GetxController {
   }
 
   Future<void> sendMessage() async {
-    if (tC.text.isEmpty) {
+    if (tC.text.isEmpty || !NetworkManager.to.chackNetwork()) {
       return;
     }
 
-    FocusScope.of(Get.context!).unfocus();
     final users = [currentUser, withUser];
     final messageId = Uuid().v4();
     final text = tC.text;
@@ -220,6 +221,7 @@ extension MessageControllerExtension on MessageController {
 
   void listenFocus() {
     return fN.addListener(() {
+      showPanel.value = fN.hasFocus;
       if (fN.hasFocus) {
         if (showEmoji.value) showEmoji.value = false;
       }

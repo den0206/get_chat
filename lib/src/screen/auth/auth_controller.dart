@@ -9,6 +9,8 @@ class AuthController extends GetxService {
   Rxn<User> user = Rxn<User>();
   FirebaseAuth auth = FirebaseAuth.instance;
 
+  static AuthController get to => Get.find();
+
   FBUser? currentUser;
   FBUser get current => currentUser!;
 
@@ -44,7 +46,7 @@ class AuthController extends GetxService {
     try {
       user.value = null;
       currentUser = null;
-      RecentsController.to.recents.clear();
+      await Get.delete<RecentsController>();
       print(currentUser);
       await auth.signOut();
     } catch (e) {
@@ -52,5 +54,3 @@ class AuthController extends GetxService {
     }
   }
 }
-
-final current = Get.find<AuthController>().current;

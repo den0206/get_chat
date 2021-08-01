@@ -16,6 +16,7 @@ import 'package:getx_chat/src/screen/network_branch.dart/network_branch.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
 import 'package:getx_chat/src/utils/image_extension.dart';
 import 'package:getx_chat/src/utils/storageSearvice.dart';
+import 'package:getx_chat/src/utils/video_extension.dart';
 import 'package:getx_chat/src/widgets/custom_dialog.dart';
 import 'package:uuid/uuid.dart';
 
@@ -83,7 +84,7 @@ class MessageController extends GetxController {
             .limit(limit);
       } else {
         await Future.delayed(Duration(seconds: 2));
-        print("More");
+
         ref = firebaseRef(FirebaseRef.message)
             .doc(currentUser.uid)
             .collection(chatRoomId)
@@ -168,25 +169,63 @@ class MessageController extends GetxController {
     await updateRecent(chatRoomId, message.text);
   }
 
-  Future<void> sendImageMessage(File imageFile) async {
+  Future<void> sendMediaText(File file, MessageType type) async {
     if (!NetworkManager.to.chackNetwork()) {
       return;
     }
 
     final messageId = Uuid().v4();
-    String _imageUrl = await StorageSeavice.uploadStorage(
-        StorageRef.message, "${currentUser.uid}/$messageId", imageFile);
+    final videoPath = "${currentUser.uid}/$messageId/video";
+    final imagePath = "${currentUser.uid}/$messageId/image";
+
+    String imageUrl;
+    String lastMessage;
+    String? videoUrl;
+
+    if (type == MessageType.image) {
+      lastMessage = "Image";
+      imageUrl = await StorageSeavice.uploadStorage(
+        ref: StorageRef.source,
+        path: imagePath,
+        file: file,
+      );
+    } else if (type == MessageType.video) {
+      lastMessage = "Video";
+      final thubnail = await VideoExtension.getThumbnail(file);
+
+      if (thubnail == null) {
+        return;
+      }
+
+      imageUrl = await StorageSeavice.uploadStorage(
+        ref: StorageRef.source,
+        path: imagePath,
+        file: thubnail,
+      );
+
+      videoUrl = await StorageSeavice.uploadStorage(
+        ref: StorageRef.source,
+        path: videoPath,
+        file: file,
+        type: UploadType.video,
+      );
+    } else {
+      return;
+    }
 
     Message message = Message(
       id: messageId,
       chatRoomId: chatRoomId,
-      text: "image",
+      text: lastMessage,
       userId: currentUser.uid,
       date: Timestamp.now(),
       read: false,
     );
 
-    message.imageUrl = _imageUrl;
+    message.imageUrl = imageUrl;
+    if (videoUrl != null) {
+      message.videoUrl = videoUrl;
+    }
 
     [currentUser, withUser].forEach((user) async {
       await firebaseRef(FirebaseRef.message)
@@ -218,7 +257,7 @@ extension MessageControllerExtension on MessageController {
     }
   }
 
-  void showFileSheet() {
+  void showBottomSheet() {
     final List<MessageFileButton> actions = [
       MessageFileButton(
         icon: Icons.camera,
@@ -232,14 +271,19 @@ extension MessageControllerExtension on MessageController {
           final selectedImage = await ImageExtension.selectImage();
           if (selectedImage != null) {
             Get.back();
-            sendImageMessage(selectedImage);
+            sendMediaText(selectedImage, MessageType.image);
           }
         },
       ),
       MessageFileButton(
         icon: Icons.videocam,
-        onPress: () {
-          print("Mocvie");
+        onPress: () async {
+          final selectedVideo = await VideoExtension.getGarallyVideo();
+
+          if (selectedVideo != null) {
+            Get.back();
+            sendMediaText(selectedVideo, MessageType.video);
+          }
         },
       ),
       MessageFileButton(

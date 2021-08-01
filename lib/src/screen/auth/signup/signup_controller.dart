@@ -52,7 +52,7 @@ class SignUpController extends GetxController {
         final _uid = _credentiol.user!.uid;
 
         String _imageUrl = await StorageSeavice.uploadStorage(
-            StorageRef.profile, "$_uid", userImage.value!);
+            ref: StorageRef.profile, path: "$_uid", file: userImage.value!);
 
         print(_imageUrl);
 

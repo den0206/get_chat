@@ -13,11 +13,14 @@ class Message {
   final Timestamp date;
 
   String? imageUrl;
+  String? videoUrl;
 
   bool read;
 
   MessageType get type {
-    if (imageUrl != null) {
+    if (videoUrl != null && imageUrl != null) {
+      return MessageType.video;
+    } else if (imageUrl != null) {
       return MessageType.image;
     }
     return MessageType.text;
@@ -39,6 +42,7 @@ class Message {
     required this.date,
     required this.read,
     this.imageUrl,
+    this.videoUrl,
   });
 
   Map<String, dynamic> toMap() {
@@ -51,23 +55,29 @@ class Message {
       MessageKey.read: read,
     };
     if (imageUrl != null) map[MessageKey.imageUrl] = imageUrl;
+    if (videoUrl != null) map[MessageKey.videoUrl] = videoUrl;
     return map;
   }
 
   factory Message.fromMap(DocumentSnapshot<Object?> map) {
     return Message(
-        id: map[MessageKey.id],
-        chatRoomId: map[MessageKey.chatRoomId],
-        text: map[MessageKey.text],
-        userId: map[MessageKey.userId],
-        date: map[MessageKey.date],
-        read: (map.data() as Map<String, dynamic>).containsKey(MessageKey.read)
-            ? map[MessageKey.read]
-            : false,
-        imageUrl: (map.data() as Map<String, dynamic>)
-                .containsKey(MessageKey.imageUrl)
-            ? map[MessageKey.imageUrl]
-            : null);
+      id: map[MessageKey.id],
+      chatRoomId: map[MessageKey.chatRoomId],
+      text: map[MessageKey.text],
+      userId: map[MessageKey.userId],
+      date: map[MessageKey.date],
+      read: (map.data() as Map<String, dynamic>).containsKey(MessageKey.read)
+          ? map[MessageKey.read]
+          : false,
+      imageUrl:
+          (map.data() as Map<String, dynamic>).containsKey(MessageKey.imageUrl)
+              ? map[MessageKey.imageUrl]
+              : null,
+      videoUrl:
+          (map.data() as Map<String, dynamic>).containsKey(MessageKey.videoUrl)
+              ? map[MessageKey.videoUrl]
+              : null,
+    );
   }
 
   static MessageType typefromString(String value) {
@@ -76,6 +86,8 @@ class Message {
         return MessageType.text;
       case "Image":
         return MessageType.image;
+      case "Video":
+        return MessageType.video;
       default:
         return MessageType.text;
     }
@@ -91,9 +103,10 @@ class MessageKey {
   static final read = "read";
   static final type = "type";
   static final imageUrl = "imgeUrl";
+  static final videoUrl = "videoUrl";
 }
 
-enum MessageType { text, image }
+enum MessageType { text, image, video }
 
 extension MessageTypEXT on MessageType {
   String get name {
@@ -102,6 +115,8 @@ extension MessageTypEXT on MessageType {
         return "Text";
       case MessageType.image:
         return "Image";
+      case MessageType.image:
+        return "Video";
       default:
         return "";
     }

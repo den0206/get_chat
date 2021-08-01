@@ -103,6 +103,7 @@ class RecentCell extends GetView<RecentsController> {
                   children: [
                     Positioned.fill(
                       child: CircleAvatar(
+                        backgroundColor: Colors.grey,
                         backgroundImage: getUserImage(recent.withUser),
                       ),
                     ),

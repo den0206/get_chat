@@ -5,6 +5,9 @@ import 'package:get/get_state_manager/get_state_manager.dart';
 
 import 'package:getx_chat/src/model/message.dart';
 import 'package:getx_chat/src/screen/message/message_Controller.dart';
+import 'package:getx_chat/src/screen/message/message_bubble.dart/image_bubble.dart';
+import 'package:getx_chat/src/screen/message/message_bubble.dart/text_bubble.dart';
+import 'package:getx_chat/src/screen/message/message_bubble.dart/video_bubble.dart';
 import 'package:getx_chat/src/screen/network_branch.dart/network_branch.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
 
@@ -138,6 +141,7 @@ class MessageScreen extends GetView<MessageController> {
         // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           CircleAvatar(
+            backgroundColor: Colors.grey,
             radius: 30,
             backgroundImage: getUserImage(controller.withUser),
           ),
@@ -188,172 +192,69 @@ class MessageCell extends GetView<MessageController> {
 
   @override
   Widget build(BuildContext context) {
-    return FadeinWidget(
-      child: Container(
-        margin: EdgeInsets.only(top: 10),
-        child: Column(
-          // crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    return Container(
+      margin: EdgeInsets.only(top: 10),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: message.isCurrent
+                ? MainAxisAlignment.end
+                : MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              if (!message.isCurrent)
+                CircleAvatar(
+                  backgroundColor: Colors.grey,
+                  radius: 15,
+                  backgroundImage: getUserImage(controller.withUser),
+                ),
+              SizedBox(
+                width: 10,
+              ),
+              if (message.type == MessageType.text)
+                TextBubble(message: message),
+              if (message.type == MessageType.image)
+                ImageBubble(message: message),
+              if (message.type == MessageType.video)
+                VideoBubble(message: message),
+            ],
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 5),
+            child: Row(
               mainAxisAlignment: message.isCurrent
                   ? MainAxisAlignment.end
                   : MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                if (!message.isCurrent)
-                  CircleAvatar(
-                    radius: 15,
-                    backgroundImage: getUserImage(controller.withUser),
+                if (message.isCurrent)
+                  SizedBox(
+                    width: 40,
                   ),
+                message.read && message.isCurrent
+                    ? Icon(
+                        Icons.done_all,
+                        size: 20,
+                        color: Color(0xffAEABC9),
+                      )
+                    : SizedBox(
+                        width: 50,
+                      ),
                 SizedBox(
-                  width: 10,
+                  width: 8,
                 ),
-                if (message.type == MessageType.text)
-                  GestureDetector(
-                    onLongPress: () {},
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      margin: EdgeInsets.all(10),
-                      constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width * 0.6,
-                      ),
-                      decoration: BoxDecoration(
-                        color:
-                            message.isCurrent ? Colors.green : Colors.grey[200],
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(16),
-                          topRight: Radius.circular(16),
-                          bottomLeft:
-                              Radius.circular(message.isCurrent ? 12 : 0),
-                          bottomRight:
-                              Radius.circular(message.isCurrent ? 0 : 12),
-                        ),
-                      ),
-                      child: Text(
-                        message.text,
-                        style: TextStyle(
-                            fontSize: 24,
-                            letterSpacing: 1.5,
-                            fontWeight: FontWeight.w600,
-                            color: message.isCurrent
-                                ? Colors.white
-                                : Colors.grey[800]),
-                      ),
-                    ),
+                Text(
+                  message.formattedTime,
+                  style: TextStyle(
+                    color: Color(0xffAEABC9),
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
                   ),
-                if (message.type == MessageType.image)
-                  Container(
-                    padding: EdgeInsets.only(top: 10),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
-                      child: OutlinedButton(
-                        onPressed: () {},
-                        style: ButtonStyle(
-                          padding: MaterialStateProperty.all(EdgeInsets.zero),
-                        ),
-                        child: Image.network(
-                          message.imageUrl!,
-                          loadingBuilder: (BuildContext context, Widget child,
-                              ImageChunkEvent? loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              margin: EdgeInsets.only(bottom: 10, right: 10.0),
-                              decoration: BoxDecoration(
-                                color: Colors.grey,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(8.0),
-                                ),
-                              ),
-                              width: 200.0,
-                              height: 200.0,
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.black,
-                                  value: loadingProgress.expectedTotalBytes !=
-                                              null &&
-                                          loadingProgress.expectedTotalBytes !=
-                                              null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                      : null,
-                                ),
-                              ),
-                            );
-                          },
-                          errorBuilder: (context, object, stackTrace) {
-                            return Material(
-                              child: Image.asset(
-                                'assets/images/logo.png',
-                                width: 200.0,
-                                height: 200.0,
-                                fit: BoxFit.cover,
-                              ),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(8.0),
-                              ),
-                              clipBehavior: Clip.hardEdge,
-                            );
-                          },
-                          width: 200.0,
-                          height: 200.0,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  ),
-                if (message.type == MessageType.video)
-                  Container(
-                      padding: EdgeInsets.only(top: 10),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(8)),
-                          border: Border.all(
-                            color: Colors.grey,
-                            width: 3,
-                          ),
-                        ),
-                        height: 200,
-                        width: 200,
-                      ))
+                )
               ],
             ),
-            Padding(
-              padding: EdgeInsets.only(top: 5),
-              child: Row(
-                mainAxisAlignment: message.isCurrent
-                    ? MainAxisAlignment.end
-                    : MainAxisAlignment.start,
-                children: [
-                  if (message.isCurrent)
-                    SizedBox(
-                      width: 40,
-                    ),
-                  message.read && message.isCurrent
-                      ? Icon(
-                          Icons.done_all,
-                          size: 20,
-                          color: Color(0xffAEABC9),
-                        )
-                      : SizedBox(
-                          width: 50,
-                        ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Text(
-                    message.formattedTime,
-                    style: TextStyle(
-                      color: Color(0xffAEABC9),
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1,
-                    ),
-                  )
-                ],
-              ),
-            )
-          ],
-        ),
+          )
+        ],
       ),
     );
   }

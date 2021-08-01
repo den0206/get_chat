@@ -208,6 +208,7 @@ class MessageController extends GetxController {
         path: videoPath,
         file: file,
         type: UploadType.video,
+        showValue: true,
       );
     } else {
       return;
@@ -298,6 +299,54 @@ extension MessageControllerExtension on MessageController {
       MessageFileSheet(actions: actions),
       backgroundColor: Colors.white,
     );
+  }
+
+  // void showDeleteAction(Message tempMessage) {
+  //   Get.dialog(widget);
+  // }
+
+  Future<void> deleteMessage(Message tempMessage) async {
+    List<String> paths = [];
+
+    switch (tempMessage.type) {
+      case MessageType.image:
+        paths = [
+          "${currentUser.uid}/${tempMessage.id}/image",
+        ];
+        break;
+      case MessageType.video:
+        paths = [
+          "${currentUser.uid}/${tempMessage.id}/image",
+          "${currentUser.uid}/${tempMessage.id}/video"
+        ];
+        break;
+      default:
+    }
+
+    try {
+      if (paths.isNotEmpty) {
+        paths.forEach(
+          (path) async {
+            await storageRef(StorageRef.source).child(path).delete();
+          },
+        );
+      }
+
+      [currentUser, withUser].forEach(
+        (user) async {
+          await firebaseRef(FirebaseRef.message)
+              .doc(user.uid)
+              .collection(chatRoomId)
+              .doc(tempMessage.id)
+              .delete();
+        },
+      );
+
+      messages.remove(tempMessage);
+      Get.back();
+    } catch (e) {
+      showError(e);
+    }
   }
 
   /// listner

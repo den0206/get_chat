@@ -1,4 +1,5 @@
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
@@ -211,12 +212,16 @@ class MessageCell extends GetView<MessageController> {
               SizedBox(
                 width: 10,
               ),
-              if (message.type == MessageType.text)
-                TextBubble(message: message),
-              if (message.type == MessageType.image)
-                ImageBubble(message: message),
-              if (message.type == MessageType.video)
-                VideoBubble(message: message),
+              Stack(
+                children: [
+                  if (message.type == MessageType.text)
+                    TextBubble(message: message),
+                  if (message.type == MessageType.image)
+                    ImageBubble(message: message),
+                  if (message.type == MessageType.video)
+                    VideoBubble(message: message),
+                ],
+              ),
             ],
           ),
           Padding(
@@ -250,6 +255,53 @@ class MessageCell extends GetView<MessageController> {
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1,
                   ),
+                ),
+                SizedBox(
+                  width: 8,
+                ),
+                CupertinoContextMenu(
+                  child: Container(
+                    height: 20,
+                    width: 20,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white, width: 2),
+                      shape: BoxShape.circle,
+                      color: Colors.grey,
+                    ),
+                    child: Icon(
+                      Icons.menu,
+                      color: Colors.white,
+                      size: 10,
+                    ),
+                  ),
+                  actions: [
+                    CupertinoContextMenuAction(
+                      isDefaultAction: true,
+                      child: const Text('Copy'),
+                      onPressed: () {
+                        print("Copy");
+                      },
+                    ),
+                    if (message.isCurrent)
+                      CupertinoContextMenuAction(
+                        isDefaultAction: true,
+                        child: const Text(
+                          'Delete',
+                          style: TextStyle(
+                            color: Colors.red,
+                          ),
+                        ),
+                        onPressed: () {
+                          controller.deleteMessage(message);
+                        },
+                      ),
+                    CupertinoContextMenuAction(
+                      child: const Text('Cancel'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
                 )
               ],
             ),

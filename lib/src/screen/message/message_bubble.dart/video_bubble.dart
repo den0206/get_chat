@@ -48,6 +48,7 @@ class VideoBubbleController extends GetxController {
     chewieController = ChewieController(
       videoPlayerController: videoPlayerController,
       autoPlay: false,
+      autoInitialize: true,
       aspectRatio: videoPlayerController.value.size.aspectRatio,
       fullScreenByDefault: false,
       deviceOrientationsAfterFullScreen: [
@@ -111,6 +112,7 @@ class VideoBubble extends StatelessWidget {
                 maxHeight: 250,
                 maxWidth: 300,
               ),
+              decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
               // width: 300,
               // height: 200,
               child: !controller.isPlayng.value

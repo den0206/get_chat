@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:getx_chat/src/screen/auth/signup/signup_controller.dart';
-import 'package:getx_chat/src/screen/widgets/custom_button.dart';
-import 'package:getx_chat/src/screen/widgets/custom_textfield.dart';
-import 'package:getx_chat/src/screen/widgets/images_crousel.dart';
+import 'package:getx_chat/src/widgets/custom_button.dart';
+import 'package:getx_chat/src/widgets/custom_textfield.dart';
+import 'package:getx_chat/src/widgets/images_crousel.dart';
 
 class SignUpScreen extends GetView<SignUpController> {
   SignUpScreen({Key? key}) : super(key: key);

@@ -2,13 +2,15 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 
-enum StorageRef { profile }
+enum StorageRef { profile, message }
 
 extension StorageRefExtension on StorageRef {
   String get path {
     switch (this) {
       case StorageRef.profile:
         return "Profile";
+      case StorageRef.message:
+        return "Message";
       default:
         return "";
     }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:getx_chat/src/screen/user_detail/base_widget.dart';
+import 'package:getx_chat/src/screen/network_branch.dart/network_branch.dart';
 import 'package:getx_chat/src/screen/user_detail/user_detail_controller.dart';
-import 'package:getx_chat/src/screen/widgets/custom_button.dart';
+import 'package:getx_chat/src/widgets/custom_button.dart';
 
 class UserDetailScreen extends GetView<UserDetailController> {
   const UserDetailScreen({

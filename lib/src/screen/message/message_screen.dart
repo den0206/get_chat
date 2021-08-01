@@ -5,7 +5,7 @@ import 'package:get/get_state_manager/get_state_manager.dart';
 
 import 'package:getx_chat/src/model/message.dart';
 import 'package:getx_chat/src/screen/message/message_Controller.dart';
-import 'package:getx_chat/src/screen/user_detail/base_widget.dart';
+import 'package:getx_chat/src/screen/network_branch.dart/network_branch.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
 
 class MessageScreen extends GetView<MessageController> {
@@ -135,6 +135,7 @@ class MessageScreen extends GetView<MessageController> {
       elevation: 0,
       backgroundColor: Colors.transparent,
       title: Row(
+        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           CircleAvatar(
             radius: 30,
@@ -164,16 +165,15 @@ class MessageScreen extends GetView<MessageController> {
                     fontWeight: FontWeight.w500),
               ),
             ],
-          )
+          ),
+          Spacer(),
+          Icon(
+            Icons.settings,
+            color: Colors.black54,
+            size: 32,
+          ),
         ],
       ),
-      actions: [
-        Icon(
-          Icons.settings,
-          color: Colors.black54,
-          size: 28,
-        ),
-      ],
     );
   }
 }
@@ -207,35 +207,98 @@ class MessageCell extends GetView<MessageController> {
               SizedBox(
                 width: 10,
               ),
-              GestureDetector(
-                onLongPress: () {},
-                child: Container(
-                  padding: EdgeInsets.all(10),
-                  margin: EdgeInsets.all(10),
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: message.isCurrent ? Colors.green : Colors.grey[200],
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      topRight: Radius.circular(16),
-                      bottomLeft: Radius.circular(message.isCurrent ? 12 : 0),
-                      bottomRight: Radius.circular(message.isCurrent ? 0 : 12),
+              if (message.type == MessageType.text)
+                GestureDetector(
+                  onLongPress: () {},
+                  child: Container(
+                    padding: EdgeInsets.all(10),
+                    margin: EdgeInsets.all(10),
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.6,
+                    ),
+                    decoration: BoxDecoration(
+                      color:
+                          message.isCurrent ? Colors.green : Colors.grey[200],
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        topRight: Radius.circular(16),
+                        bottomLeft: Radius.circular(message.isCurrent ? 12 : 0),
+                        bottomRight:
+                            Radius.circular(message.isCurrent ? 0 : 12),
+                      ),
+                    ),
+                    child: Text(
+                      message.text,
+                      style: TextStyle(
+                          fontSize: 24,
+                          letterSpacing: 1.5,
+                          fontWeight: FontWeight.w600,
+                          color: message.isCurrent
+                              ? Colors.white
+                              : Colors.grey[800]),
                     ),
                   ),
-                  child: Text(
-                    message.text,
-                    style: TextStyle(
-                        fontSize: 24,
-                        letterSpacing: 1.5,
-                        fontWeight: FontWeight.w600,
-                        color: message.isCurrent
-                            ? Colors.white
-                            : Colors.grey[800]),
-                  ),
                 ),
-              ),
+              if (message.type == MessageType.image)
+                Container(
+                  padding: EdgeInsets.only(top: 10),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    child: OutlinedButton(
+                      onPressed: () {},
+                      style: ButtonStyle(
+                        padding: MaterialStateProperty.all(EdgeInsets.zero),
+                      ),
+                      child: Image.network(
+                        message.imageUrl!,
+                        loadingBuilder: (BuildContext context, Widget child,
+                            ImageChunkEvent? loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            margin: EdgeInsets.only(bottom: 10, right: 10.0),
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(8.0),
+                              ),
+                            ),
+                            width: 200.0,
+                            height: 200.0,
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.black,
+                                value: loadingProgress.expectedTotalBytes !=
+                                            null &&
+                                        loadingProgress.expectedTotalBytes !=
+                                            null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, object, stackTrace) {
+                          return Material(
+                            child: Image.asset(
+                              'assets/images/logo.png',
+                              width: 200.0,
+                              height: 200.0,
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(8.0),
+                            ),
+                            clipBehavior: Clip.hardEdge,
+                          );
+                        },
+                        width: 200.0,
+                        height: 200.0,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                )
             ],
           ),
           Padding(
@@ -288,6 +351,7 @@ class MessageInput extends GetView<MessageController> {
       padding: EdgeInsets.symmetric(vertical: 20),
       child: Container(
         // height: kBottomNavigationBarHeight,
+
         padding: EdgeInsets.symmetric(horizontal: 10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -299,6 +363,13 @@ class MessageInput extends GetView<MessageController> {
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(30),
+                  boxShadow: [
+                    BoxShadow(
+                      offset: Offset(0, 3),
+                      blurRadius: 5,
+                      color: Colors.black,
+                    )
+                  ],
                 ),
                 child: Row(
                   children: [
@@ -325,7 +396,7 @@ class MessageInput extends GetView<MessageController> {
                     ),
                     IconButton(
                       onPressed: () {
-                        controller.showFileShhet();
+                        controller.showFileSheet();
                       },
                       icon: Icon(Icons.attach_file, color: Colors.grey[500]),
                     )
@@ -349,7 +420,7 @@ class MessageInput extends GetView<MessageController> {
                   return null;
                 } else {
                   FocusScope.of(context).unfocus();
-                  controller.sendMessage();
+                  controller.sendTextMessage();
                 }
               },
             ),

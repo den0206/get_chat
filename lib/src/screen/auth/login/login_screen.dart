@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/instance_manager.dart';
 import 'package:getx_chat/src/screen/auth/login/login_controller.dart';
 import 'package:getx_chat/src/screen/auth/signup/signup_screen.dart';
-import 'package:getx_chat/src/screen/widgets/custom_button.dart';
-import 'package:getx_chat/src/screen/widgets/custom_textfield.dart';
-import 'package:getx_chat/src/screen/widgets/images_crousel.dart';
+
 import 'package:get/get.dart';
+import 'package:getx_chat/src/widgets/custom_button.dart';
+import 'package:getx_chat/src/widgets/custom_textfield.dart';
+import 'package:getx_chat/src/widgets/images_crousel.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({Key? key}) : super(key: key);

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -10,10 +11,12 @@ import 'package:getx_chat/src/model/fb_user.dart';
 import 'package:getx_chat/src/model/message.dart';
 import 'package:getx_chat/src/model/recent.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
+import 'package:getx_chat/src/screen/message/message_file_sheet.dart';
 import 'package:getx_chat/src/screen/network_branch.dart/network_branch.dart';
-import 'package:getx_chat/src/screen/widgets/custom_dialog.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
 import 'package:getx_chat/src/utils/image_extension.dart';
+import 'package:getx_chat/src/utils/storageSearvice.dart';
+import 'package:getx_chat/src/widgets/custom_dialog.dart';
 import 'package:uuid/uuid.dart';
 
 class MessageBinding extends Bindings {
@@ -105,7 +108,6 @@ class MessageController extends GetxController {
       snapshots.docs.forEach(
         (doc) {
           final Message message = Message.fromMap(doc);
-
           temp.add(message);
         },
       );
@@ -133,7 +135,7 @@ class MessageController extends GetxController {
     }
   }
 
-  Future<void> sendMessage() async {
+  Future<void> sendTextMessage() async {
     if (tC.text.isEmpty || !NetworkManager.to.chackNetwork()) {
       return;
     }
@@ -163,7 +165,39 @@ class MessageController extends GetxController {
     tC.clear();
 
     _scrollToBottom();
-    await updateRecent(chatRoomId, text);
+    await updateRecent(chatRoomId, message.text);
+  }
+
+  Future<void> sendImageMessage(File imageFile) async {
+    if (!NetworkManager.to.chackNetwork()) {
+      return;
+    }
+
+    final messageId = Uuid().v4();
+    String _imageUrl = await StorageSeavice.uploadStorage(
+        StorageRef.message, "${currentUser.uid}/$messageId", imageFile);
+
+    Message message = Message(
+      id: messageId,
+      chatRoomId: chatRoomId,
+      text: "image",
+      userId: currentUser.uid,
+      date: Timestamp.now(),
+      read: false,
+    );
+
+    message.imageUrl = _imageUrl;
+
+    [currentUser, withUser].forEach((user) async {
+      await firebaseRef(FirebaseRef.message)
+          .doc(user.uid)
+          .collection(chatRoomId)
+          .doc(messageId)
+          .set(message.toMap());
+    });
+
+    _scrollToBottom();
+    await updateRecent(chatRoomId, message.text);
   }
 
   void _scrollToBottom() {
@@ -184,35 +218,40 @@ extension MessageControllerExtension on MessageController {
     }
   }
 
-  void showFileShhet() {
-    Get.bottomSheet(
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 18),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: Icon(Icons.videocam),
-              title: Text('Camera'),
-              onTap: () {},
-            ),
-            ListTile(
-              leading: Icon(Icons.camera),
-              title: Text('Gallary'),
-              onTap: () async {
-                final a = await ImageExtension.selectImage();
-                Get.back();
-                print(a);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.close),
-              title: Text('Cancel'),
-              onTap: () => Get.back(),
-            ),
-          ],
-        ),
+  void showFileSheet() {
+    final List<MessageFileButton> actions = [
+      MessageFileButton(
+        icon: Icons.camera,
+        onPress: () {
+          print("Camera");
+        },
       ),
+      MessageFileButton(
+        icon: Icons.image,
+        onPress: () async {
+          final selectedImage = await ImageExtension.selectImage();
+          if (selectedImage != null) {
+            Get.back();
+            sendImageMessage(selectedImage);
+          }
+        },
+      ),
+      MessageFileButton(
+        icon: Icons.videocam,
+        onPress: () {
+          print("Mocvie");
+        },
+      ),
+      MessageFileButton(
+        icon: Icons.close,
+        onPress: () {
+          Get.back();
+        },
+      ),
+    ];
+
+    Get.bottomSheet(
+      MessageFileSheet(actions: actions),
       backgroundColor: Colors.white,
     );
   }

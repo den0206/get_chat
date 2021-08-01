@@ -1,8 +1,10 @@
 import 'dart:io';
 
-import 'package:getx_chat/src/screen/widgets/custom_dialog.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:getx_chat/src/widgets/custom_dialog.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:path_provider/path_provider.dart' as path_provider;
 
 class ImageExtension {
   static Future<File?> selectImage() async {
@@ -22,12 +24,27 @@ class ImageExtension {
           selectCircleStrokeColor: "#000000",
         ),
       );
-      selectedFile = await getImageFileFromAssets(results.first);
+      selectedFile = await compressFile(results.first);
     } catch (e) {
+      print(e);
       showError(e);
     }
 
     return selectedFile;
+  }
+
+  static Future<File?> compressFile(Asset asset) async {
+    final file = await getImageFileFromAssets(asset);
+
+    final dir = await path_provider.getTemporaryDirectory();
+    final targetPath = dir.absolute.path + "/temp.jpg";
+    var result = await FlutterImageCompress.compressAndGetFile(
+      file.absolute.path,
+      targetPath,
+      quality: 60,
+    );
+
+    return result;
   }
 
   static Future<File> getImageFileFromAssets(Asset asset) async {

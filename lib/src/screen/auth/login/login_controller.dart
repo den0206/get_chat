@@ -4,7 +4,7 @@ import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:get/instance_manager.dart';
 import 'package:get/state_manager.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
-import 'package:getx_chat/src/screen/widgets/custom_dialog.dart';
+import 'package:getx_chat/src/widgets/custom_dialog.dart';
 
 class LoginBinding extends Bindings {
   @override

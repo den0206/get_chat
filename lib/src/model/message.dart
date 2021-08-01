@@ -12,7 +12,16 @@ class Message {
   final String userId;
   final Timestamp date;
 
+  String? imageUrl;
+
   bool read;
+
+  MessageType get type {
+    if (imageUrl != null) {
+      return MessageType.image;
+    }
+    return MessageType.text;
+  }
 
   String get formattedTime {
     return DateFormatter().getVerboseDateTimeRepresentation(date.toDate());
@@ -29,10 +38,11 @@ class Message {
     required this.userId,
     required this.date,
     required this.read,
+    this.imageUrl,
   });
 
   Map<String, dynamic> toMap() {
-    return {
+    Map<String, dynamic> map = {
       MessageKey.id: id,
       MessageKey.chatRoomId: chatRoomId,
       MessageKey.text: text,
@@ -40,19 +50,35 @@ class Message {
       MessageKey.date: date,
       MessageKey.read: read,
     };
+    if (imageUrl != null) map[MessageKey.imageUrl] = imageUrl;
+    return map;
   }
 
   factory Message.fromMap(DocumentSnapshot<Object?> map) {
     return Message(
-      id: map[MessageKey.id],
-      chatRoomId: map[MessageKey.chatRoomId],
-      text: map[MessageKey.text],
-      userId: map[MessageKey.userId],
-      date: map[MessageKey.date],
-      read: (map.data() as Map<String, dynamic>).containsKey(MessageKey.read)
-          ? map[MessageKey.read]
-          : false,
-    );
+        id: map[MessageKey.id],
+        chatRoomId: map[MessageKey.chatRoomId],
+        text: map[MessageKey.text],
+        userId: map[MessageKey.userId],
+        date: map[MessageKey.date],
+        read: (map.data() as Map<String, dynamic>).containsKey(MessageKey.read)
+            ? map[MessageKey.read]
+            : false,
+        imageUrl: (map.data() as Map<String, dynamic>)
+                .containsKey(MessageKey.imageUrl)
+            ? map[MessageKey.imageUrl]
+            : null);
+  }
+
+  static MessageType typefromString(String value) {
+    switch (value) {
+      case "Text":
+        return MessageType.text;
+      case "Image":
+        return MessageType.image;
+      default:
+        return MessageType.text;
+    }
   }
 }
 
@@ -63,4 +89,21 @@ class MessageKey {
   static final userId = "userId";
   static final date = "date";
   static final read = "read";
+  static final type = "type";
+  static final imageUrl = "imgeUrl";
+}
+
+enum MessageType { text, image }
+
+extension MessageTypEXT on MessageType {
+  String get name {
+    switch (this) {
+      case MessageType.text:
+        return "Text";
+      case MessageType.image:
+        return "Image";
+      default:
+        return "";
+    }
+  }
 }

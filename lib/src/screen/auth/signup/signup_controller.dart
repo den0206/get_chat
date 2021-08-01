@@ -6,10 +6,10 @@ import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:get/get.dart';
 import 'package:getx_chat/src/model/fb_user.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
-import 'package:getx_chat/src/screen/widgets/custom_dialog.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
 import 'package:getx_chat/src/utils/image_extension.dart';
 import 'package:getx_chat/src/utils/storageSearvice.dart';
+import 'package:getx_chat/src/widgets/custom_dialog.dart';
 
 class SignupBinding extends Bindings {
   @override
@@ -63,7 +63,7 @@ class SignUpController extends GetxController {
           imageUrl: _imageUrl,
         );
         await firebaseRef(FirebaseRef.user).doc(_uid).set(user.toMap());
-
+        Get.back(canPop: true);
         authControllr.currentUser = user;
 
         print("Success");

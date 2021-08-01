@@ -4,7 +4,7 @@ import 'package:getx_chat/src/screen/auth/auth_controller.dart';
 import 'package:getx_chat/src/screen/auth/login/login_screen.dart';
 import 'package:get/get.dart';
 import 'package:getx_chat/src/screen/common/main_tab_screen.dart';
-import 'package:getx_chat/src/screen/widgets/loading_widget.dart';
+import 'package:getx_chat/src/widgets/loading_widget.dart';
 
 class Root extends StatelessWidget {
   const Root({Key? key}) : super(key: key);
@@ -16,7 +16,6 @@ class Root extends StatelessWidget {
       init: AuthController(),
       builder: (controller) {
         if (controller.user.value != null) {
-        
           return FutureBuilder(
             future: controller.setCurrentUser(),
             builder: (context, snapshot) {

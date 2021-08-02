@@ -11,7 +11,7 @@ import 'package:getx_chat/src/model/fb_user.dart';
 import 'package:getx_chat/src/model/message.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
 import 'package:getx_chat/src/screen/message/message_file_sheet.dart';
-import 'package:getx_chat/src/service/message_searvice.dart';
+import 'package:getx_chat/src/service/message_extention.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
 import 'package:getx_chat/src/utils/image_extension.dart';
 import 'package:getx_chat/src/utils/video_extension.dart';
@@ -33,7 +33,7 @@ class MessageController extends GetxController {
 
   final messages = <Message>[].obs;
 
-  late MessageService searvice;
+  late MessageExtentionService searvice;
   bool isloading = false;
   bool reachLast = false;
 
@@ -49,7 +49,8 @@ class MessageController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    searvice = MessageService(chatRoomId: chatRoomId, withUses: [withUser]);
+    searvice =
+        MessageExtentionService(chatRoomId: chatRoomId, withUses: [withUser]);
 
     listenFocus();
     newChatListner();

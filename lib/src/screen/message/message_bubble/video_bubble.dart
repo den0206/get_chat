@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:get/state_manager.dart';
-import 'package:getx_chat/src/screen/message/message_bubble.dart/image_bubble.dart';
+import 'package:getx_chat/src/screen/message/message_bubble/image_bubble.dart';
 import 'package:video_player/video_player.dart';
 
 import 'package:getx_chat/src/model/message.dart';

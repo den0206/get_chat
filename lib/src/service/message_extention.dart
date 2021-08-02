@@ -13,7 +13,7 @@ import 'package:getx_chat/src/utils/storageSearvice.dart';
 import 'package:getx_chat/src/utils/video_extension.dart';
 import 'package:uuid/uuid.dart';
 
-class MessageService {
+class MessageExtentionService {
   late final String chatRoomId;
   late final List<FBUser> withUses;
   FBUser get withUser => withUses.first;
@@ -23,7 +23,7 @@ class MessageService {
 
   DocumentSnapshot? lastDoc;
 
-  MessageService({
+  MessageExtentionService({
     required this.chatRoomId,
     required this.withUses,
   });

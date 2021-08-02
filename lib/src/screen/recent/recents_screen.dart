@@ -146,13 +146,18 @@ class RecentCell extends GetView<RecentsController> {
                   SizedBox(
                     height: 5,
                   ),
-                  Text(
-                    recent.lastMessage,
-                    style: TextStyle(
+                  Container(
+                    constraints: BoxConstraints(minWidth: 100, maxWidth: 200),
+                    child: Text(
+                      recent.lastMessage,
+                      maxLines: 2,
+                      style: TextStyle(
                         color: Colors.black,
                         fontSize: 14,
                         letterSpacing: 1.2,
-                        fontWeight: FontWeight.w500),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   )
                 ],
               ),

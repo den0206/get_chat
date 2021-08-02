@@ -9,16 +9,13 @@ import 'package:get/state_manager.dart';
 import 'package:get/get.dart';
 import 'package:getx_chat/src/model/fb_user.dart';
 import 'package:getx_chat/src/model/message.dart';
-import 'package:getx_chat/src/model/recent.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
 import 'package:getx_chat/src/screen/message/message_file_sheet.dart';
-import 'package:getx_chat/src/screen/network_branch.dart/network_branch.dart';
+import 'package:getx_chat/src/service/message_searvice.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
 import 'package:getx_chat/src/utils/image_extension.dart';
-import 'package:getx_chat/src/utils/storageSearvice.dart';
 import 'package:getx_chat/src/utils/video_extension.dart';
 import 'package:getx_chat/src/widgets/custom_dialog.dart';
-import 'package:uuid/uuid.dart';
 
 class MessageBinding extends Bindings {
   @override
@@ -33,17 +30,17 @@ class MessageController extends GetxController {
   final FBUser withUser = Get.arguments[1];
 
   final currentUser = Get.find<AuthController>().current;
-  final int limit = 10;
 
   final messages = <Message>[].obs;
+
+  late MessageService searvice;
   bool isloading = false;
+  bool reachLast = false;
 
   final RxBool showEmoji = false.obs;
   final RxBool showPanel = false.obs;
 
-  DocumentSnapshot? lastDoc;
-  List<StreamSubscription<QuerySnapshot>> streams = [];
-  bool reachLast = false;
+  List<StreamSubscription<QuerySnapshot>> listners = [];
 
   final FocusNode fN = FocusNode();
   final TextEditingController tC = TextEditingController();
@@ -52,9 +49,9 @@ class MessageController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    searvice = MessageService(chatRoomId: chatRoomId, withUses: [withUser]);
 
     listenFocus();
-
     newChatListner();
     loadMessage();
   }
@@ -63,59 +60,27 @@ class MessageController extends GetxController {
   void onClose() {
     fN.dispose();
     sC.dispose();
-    for (final stream in streams) stream.cancel();
+    for (final stream in listners) stream.cancel();
     super.onClose();
   }
 
   Future<void> loadMessage() async {
-    if (reachLast || isloading) {
+    if (reachLast) {
       return;
     }
+
     isloading = true;
 
     try {
-      Query ref;
+      final tempMessage = await searvice.loadMessage();
 
-      if (lastDoc == null) {
-        ref = firebaseRef(FirebaseRef.message)
-            .doc(currentUser.uid)
-            .collection(chatRoomId)
-            .orderBy(MessageKey.date, descending: true)
-            .limit(limit);
-      } else {
-        await Future.delayed(Duration(seconds: 2));
-
-        ref = firebaseRef(FirebaseRef.message)
-            .doc(currentUser.uid)
-            .collection(chatRoomId)
-            .orderBy(MessageKey.date, descending: true)
-            .startAfterDocument(lastDoc!)
-            .limit(limit);
-      }
-
-      final snapshots = await ref.get();
-
-      if (snapshots.docs.length < limit) {
+      if (tempMessage.length < searvice.limit) {
         reachLast = true;
       }
-      if (snapshots.docs.isEmpty) {
-        return;
-      }
 
-      List<Message> temp = [];
+      messages.addAll(tempMessage);
 
-      lastDoc = snapshots.docs.last;
-
-      snapshots.docs.forEach(
-        (doc) {
-          final Message message = Message.fromMap(doc);
-          temp.add(message);
-        },
-      );
-
-      messages.addAll(temp);
-
-      List<String> unReadMessages = temp
+      List<String> unReadMessages = tempMessage
           .where((message) => !message.read && message.isCurrent)
           .map((e) => e.id)
           .toList();
@@ -136,108 +101,20 @@ class MessageController extends GetxController {
     }
   }
 
-  Future<void> sendTextMessage() async {
-    if (tC.text.isEmpty || !NetworkManager.to.chackNetwork()) {
-      return;
-    }
-
-    final users = [currentUser, withUser];
-    final messageId = Uuid().v4();
-    final text = tC.text;
-
-    final Message message = Message(
-      id: messageId,
-      chatRoomId: chatRoomId,
-      text: text,
-      userId: currentUser.uid,
-      date: Timestamp.now(),
-      read: false,
-    );
-
-    users.forEach(
-      (user) async {
-        await firebaseRef(FirebaseRef.message)
-            .doc(user.uid)
-            .collection(chatRoomId)
-            .doc(messageId)
-            .set(message.toMap());
-      },
-    );
+  Future<void> sendMessage(MessageType type, [File? file]) async {
+    await searvice.sendMessage(type, tC.text, file);
     tC.clear();
-
     _scrollToBottom();
-    await updateRecent(chatRoomId, message.text);
   }
 
-  Future<void> sendMediaText(File file, MessageType type) async {
-    if (!NetworkManager.to.chackNetwork()) {
-      return;
+  Future<void> deleteMessage(Message tempMessage) async {
+    try {
+      await searvice.deleteMessage(tempMessage);
+      messages.remove(tempMessage);
+      Get.back();
+    } catch (e) {
+      showError(e);
     }
-
-    final messageId = Uuid().v4();
-    final videoPath = "${currentUser.uid}/$messageId/video";
-    final imagePath = "${currentUser.uid}/$messageId/image";
-
-    String imageUrl;
-    String lastMessage;
-    String? videoUrl;
-
-    if (type == MessageType.image) {
-      lastMessage = "Image";
-      imageUrl = await StorageSeavice.uploadStorage(
-        ref: StorageRef.source,
-        path: imagePath,
-        file: file,
-      );
-    } else if (type == MessageType.video) {
-      lastMessage = "Video";
-      final thubnail = await VideoExtension.getThumbnail(file);
-
-      if (thubnail == null) {
-        return;
-      }
-
-      imageUrl = await StorageSeavice.uploadStorage(
-        ref: StorageRef.source,
-        path: imagePath,
-        file: thubnail,
-      );
-
-      videoUrl = await StorageSeavice.uploadStorage(
-        ref: StorageRef.source,
-        path: videoPath,
-        file: file,
-        type: UploadType.video,
-        showValue: true,
-      );
-    } else {
-      return;
-    }
-
-    Message message = Message(
-      id: messageId,
-      chatRoomId: chatRoomId,
-      text: lastMessage,
-      userId: currentUser.uid,
-      date: Timestamp.now(),
-      read: false,
-    );
-
-    message.imageUrl = imageUrl;
-    if (videoUrl != null) {
-      message.videoUrl = videoUrl;
-    }
-
-    [currentUser, withUser].forEach((user) async {
-      await firebaseRef(FirebaseRef.message)
-          .doc(user.uid)
-          .collection(chatRoomId)
-          .doc(messageId)
-          .set(message.toMap());
-    });
-
-    _scrollToBottom();
-    await updateRecent(chatRoomId, message.text);
   }
 
   void _scrollToBottom() {
@@ -272,7 +149,7 @@ extension MessageControllerExtension on MessageController {
           final selectedImage = await ImageExtension.selectImage();
           if (selectedImage != null) {
             Get.back();
-            sendMediaText(selectedImage, MessageType.image);
+            sendMessage(MessageType.image, selectedImage);
           }
         },
       ),
@@ -283,7 +160,7 @@ extension MessageControllerExtension on MessageController {
 
           if (selectedVideo != null) {
             Get.back();
-            sendMediaText(selectedVideo, MessageType.video);
+            sendMessage(MessageType.video, selectedVideo);
           }
         },
       ),
@@ -299,54 +176,6 @@ extension MessageControllerExtension on MessageController {
       MessageFileSheet(actions: actions),
       backgroundColor: Colors.white,
     );
-  }
-
-  // void showDeleteAction(Message tempMessage) {
-  //   Get.dialog(widget);
-  // }
-
-  Future<void> deleteMessage(Message tempMessage) async {
-    List<String> paths = [];
-
-    switch (tempMessage.type) {
-      case MessageType.image:
-        paths = [
-          "${currentUser.uid}/${tempMessage.id}/image",
-        ];
-        break;
-      case MessageType.video:
-        paths = [
-          "${currentUser.uid}/${tempMessage.id}/image",
-          "${currentUser.uid}/${tempMessage.id}/video"
-        ];
-        break;
-      default:
-    }
-
-    try {
-      if (paths.isNotEmpty) {
-        paths.forEach(
-          (path) async {
-            await storageRef(StorageRef.source).child(path).delete();
-          },
-        );
-      }
-
-      [currentUser, withUser].forEach(
-        (user) async {
-          await firebaseRef(FirebaseRef.message)
-              .doc(user.uid)
-              .collection(chatRoomId)
-              .doc(tempMessage.id)
-              .delete();
-        },
-      );
-
-      messages.remove(tempMessage);
-      Get.back();
-    } catch (e) {
-      showError(e);
-    }
   }
 
   /// listner
@@ -387,7 +216,7 @@ extension MessageControllerExtension on MessageController {
       },
     );
 
-    streams.add(_subscription);
+    listners.add(_subscription);
   }
 
   void readListner(List<String> unreads) {
@@ -417,8 +246,8 @@ extension MessageControllerExtension on MessageController {
       },
     );
 
-    streams.add(_subscription);
-    print(streams.length);
+    listners.add(_subscription);
+    print(listners.length);
   }
 
   void updateReadStatus(Message tempMessage) {

@@ -390,7 +390,7 @@ class MessageInput extends GetView<MessageController> {
                   return null;
                 } else {
                   FocusScope.of(context).unfocus();
-                  controller.sendTextMessage();
+                  controller.sendMessage(MessageType.text);
                 }
               },
             ),

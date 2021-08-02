@@ -26,6 +26,20 @@ class Message {
     return MessageType.text;
   }
 
+  String get imagePath {
+    if (imageUrl != null) {
+      return "$userId/$id/image";
+    }
+    return "";
+  }
+
+  String get videoPath {
+    if (videoUrl != null) {
+      return "$userId/$id/video";
+    }
+    return "";
+  }
+
   String get formattedTime {
     return DateFormatter().getVerboseDateTimeRepresentation(date.toDate());
   }

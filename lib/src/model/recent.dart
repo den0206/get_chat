@@ -149,7 +149,8 @@ void createRecentFirestore(
   ref.set(data);
 }
 
-Future<void> updateRecent(String chatRoomId, String lastMessage) async {
+Future<void> updateRecent(String chatRoomId, String lastMessage,
+    [bool isDelete = false]) async {
   final q = await firebaseRef(FirebaseRef.recent)
       .where(RecentKey.chatRoomId, isEqualTo: chatRoomId)
       .get();
@@ -158,19 +159,26 @@ Future<void> updateRecent(String chatRoomId, String lastMessage) async {
     q.docs.forEach(
       (doc) {
         final recent = Recent.fromMap(doc);
-        updateRecentToFirestore(recent, lastMessage);
+        updateRecentToFirestore(recent, lastMessage, isDelete);
       },
     );
 }
 
-void updateRecentToFirestore(Recent recent, String lastMessage) {
+void updateRecentToFirestore(Recent recent, String lastMessage, bool isDelete) {
   final date = Timestamp.now();
   final uid = recent.userId;
   final currentUid = Get.find<AuthController>().current.uid;
   var counter = recent.counter;
 
   if (currentUid != uid) {
-    counter += 1;
+    if (!isDelete) {
+      ++counter;
+    } else {
+      --counter;
+      if (counter < 0) {
+        counter = 0;
+      }
+    }
   }
 
   final value = {

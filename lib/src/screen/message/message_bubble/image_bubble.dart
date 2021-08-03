@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:get/get.dart';
 import 'package:getx_chat/src/model/message.dart';
 
 class ImageBubble extends StatelessWidget {
@@ -12,47 +12,76 @@ class ImageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(
-          Radius.circular(8),
+    return GestureDetector(
+      onTap: () {
+        Get.to(ImageDetailScreen(imageUrl: message.imageUrl!));
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(
+            Radius.circular(8),
+          ),
+          border: Border.all(color: Colors.grey, width: 2),
         ),
-        border: Border.all(color: Colors.grey, width: 2),
+        child: Image.network(
+          message.imageUrl!,
+          width: 200.0,
+          height: 200.0,
+          fit: BoxFit.cover,
+          loadingBuilder: (BuildContext context, Widget child,
+              ImageChunkEvent? loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              margin: EdgeInsets.only(bottom: 10, right: 10.0),
+              decoration: BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.all(
+                  Radius.circular(8.0),
+                ),
+              ),
+              width: 200.0,
+              height: 200.0,
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: Colors.black,
+                  value: loadingProgress.expectedTotalBytes != null &&
+                          loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                          loadingProgress.expectedTotalBytes!
+                      : null,
+                ),
+              ),
+            );
+          },
+          errorBuilder: (context, object, stackTrace) {
+            return ErrorImageWidget();
+          },
+        ),
       ),
-      child: Image.network(
-        message.imageUrl!,
-        width: 200.0,
-        height: 200.0,
-        fit: BoxFit.cover,
-        loadingBuilder: (BuildContext context, Widget child,
-            ImageChunkEvent? loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Container(
-            margin: EdgeInsets.only(bottom: 10, right: 10.0),
-            decoration: BoxDecoration(
-              color: Colors.grey,
-              borderRadius: BorderRadius.all(
-                Radius.circular(8.0),
-              ),
-            ),
-            width: 200.0,
-            height: 200.0,
-            child: Center(
-              child: CircularProgressIndicator(
-                color: Colors.black,
-                value: loadingProgress.expectedTotalBytes != null &&
-                        loadingProgress.expectedTotalBytes != null
-                    ? loadingProgress.cumulativeBytesLoaded /
-                        loadingProgress.expectedTotalBytes!
-                    : null,
-              ),
-            ),
-          );
-        },
-        errorBuilder: (context, object, stackTrace) {
-          return ErrorImageWidget();
-        },
+    );
+  }
+}
+
+class ImageDetailScreen extends StatelessWidget {
+  const ImageDetailScreen({
+    Key? key,
+    required this.imageUrl,
+  }) : super(key: key);
+
+  final String imageUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Get.back();
+      },
+      child: Center(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Image.network(imageUrl),
+        ),
       ),
     );
   }

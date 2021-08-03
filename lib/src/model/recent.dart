@@ -1,39 +1,48 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:getx_chat/src/model/fb_user.dart';
+import 'package:getx_chat/src/model/group.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
 import 'package:getx_chat/src/utils/date_format.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
 import 'package:get/get.dart';
+import 'package:uuid/uuid.dart';
+
+enum RecentType { private, group }
 
 class Recent {
   final String id;
   final String userId;
-  final String withUserId;
   final String chatRoomId;
   final String lastMessage;
   int counter;
-
   final Timestamp date;
 
-  late FBUser withUser;
-
-  RxInt tempCounter() {
-    return counter.obs;
-  }
+  final String? withUserId;
+  FBUser? withUser;
+  final String? groupId;
+  Group? group;
 
   String get formattedTime {
     return DateFormatter().getVerboseDateTimeRepresentation(date.toDate());
   }
 
+  RecentType get type {
+    if (groupId != null) {
+      return RecentType.group;
+    }
+    return RecentType.private;
+  }
+
   Recent({
     required this.id,
     required this.userId,
-    required this.withUserId,
     required this.chatRoomId,
     required this.lastMessage,
     required this.counter,
     required this.date,
+    this.withUserId,
+    this.groupId,
   });
 
   factory Recent.fromMap(DocumentSnapshot map) {
@@ -127,6 +136,30 @@ Future<String> createChatRoom(
   );
 
   return chatRoomId;
+}
+
+Future<Group> createGroupChat(List<FBUser> members) async {
+  final id = Uuid().v4();
+  final owner = AuthController.to.current;
+  members.insert(0, owner);
+
+  final group = Group(
+    id: id,
+    ownerId: owner.uid,
+    members: members,
+  );
+
+  group.members.forEach(
+    (user) {
+      firebaseRef(FirebaseRef.group)
+          .doc(user.uid)
+          .collection(GroupKey.kGroup)
+          .doc(id)
+          .set(group.toMap());
+    },
+  );
+
+  return group;
 }
 
 void createRecentFirestore(

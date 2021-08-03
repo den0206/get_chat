@@ -12,6 +12,7 @@ import 'package:getx_chat/src/screen/message/message_screen.dart';
 import 'package:getx_chat/src/screen/root.dart';
 import 'package:getx_chat/src/screen/user_detail/user_detail_controller.dart';
 import 'package:getx_chat/src/screen/user_detail/user_detail_sceen.dart';
+import 'package:getx_chat/src/screen/users/users_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -64,9 +65,17 @@ class MyApp extends StatelessWidget {
           binding: UserDetailBinding(),
         ),
         GetPage(
-            name: MessageScreen.routeName,
-            page: () => MessageScreen(),
-            binding: MessageBinding())
+          name: MessageScreen.routeName,
+          page: () => MessageScreen(),
+          binding: MessageBinding(),
+        ),
+        GetPage(
+          name: UsersScreen.routeName,
+          page: () => UsersScreen(
+            isPrivate: false,
+          ),
+          fullscreenDialog: true,
+        )
       ],
 
       initialRoute: NetworkBranch.routeName,

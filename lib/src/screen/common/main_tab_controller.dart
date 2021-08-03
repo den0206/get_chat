@@ -33,7 +33,9 @@ class MainTabController extends GetxController {
   final List<Widget> pages = [
     RecentsScreen(),
     HomeScreen(),
-    UsersScreen(),
+    UsersScreen(
+      isPrivate: true,
+    ),
   ];
 
   @override

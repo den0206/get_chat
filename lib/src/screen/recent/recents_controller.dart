@@ -23,7 +23,6 @@ class RecentsController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    print("INIT");
     recentListner();
     loadRecents();
   }

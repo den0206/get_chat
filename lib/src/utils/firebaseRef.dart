@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
 import 'package:getx_chat/src/model/fb_user.dart';
 
-enum FirebaseRef { user, recent, message }
+enum FirebaseRef { user, recent, message, group }
 
 extension FirebaseRefExtension on FirebaseRef {
   String get path {
@@ -13,6 +13,8 @@ extension FirebaseRefExtension on FirebaseRef {
         return "Recent";
       case FirebaseRef.message:
         return "Message";
+      case FirebaseRef.group:
+        return "Group";
 
       default:
         return "";

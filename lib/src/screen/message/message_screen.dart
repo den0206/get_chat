@@ -1,6 +1,7 @@
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 
@@ -214,13 +215,16 @@ class MessageCell extends GetView<MessageController> {
               ),
               CupertinoContextMenu(
                 actions: [
-                  CupertinoContextMenuAction(
-                    isDefaultAction: true,
-                    child: const Text('Copy'),
-                    onPressed: () {
-                      print("Copy");
-                    },
-                  ),
+                  if (message.type == MessageType.text)
+                    CupertinoContextMenuAction(
+                      isDefaultAction: true,
+                      child: const Text('Copy'),
+                      onPressed: () async {
+                        final data = ClipboardData(text: message.text);
+                        await Clipboard.setData(data);
+                        Get.back();
+                      },
+                    ),
                   if (message.isCurrent)
                     CupertinoContextMenuAction(
                       isDefaultAction: true,

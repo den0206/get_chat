@@ -62,9 +62,9 @@ class SignUpController extends GetxController {
           email: _email,
           imageUrl: _imageUrl,
         );
+        authControllr.currentUser = user;
         await firebaseRef(FirebaseRef.user).doc(_uid).set(user.toMap());
         Get.back(canPop: true);
-        authControllr.currentUser = user;
 
         print("Success");
       }

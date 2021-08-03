@@ -21,7 +21,7 @@ class TextBubble extends StatelessWidget {
           maxWidth: MediaQuery.of(context).size.width * 0.6,
         ),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.black),
+          // border: Border.all(color: Colors.black),
           color: message.isCurrent ? Colors.green : Colors.grey[200],
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(16),

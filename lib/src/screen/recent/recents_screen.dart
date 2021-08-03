@@ -6,6 +6,7 @@ import 'package:getx_chat/src/model/recent.dart';
 import 'package:getx_chat/src/screen/message/message_screen.dart';
 import 'package:getx_chat/src/screen/recent/recents_controller.dart';
 import 'package:get/get.dart';
+import 'package:getx_chat/src/screen/users/users_screen.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
 
 class RecentsScreen extends GetView<RecentsController> {
@@ -22,6 +23,16 @@ class RecentsScreen extends GetView<RecentsController> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         title: Text('Recents'),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.person_add,
+            ),
+            onPressed: () {
+              Get.toNamed(UsersScreen.routeName, arguments: false);
+            },
+          )
+        ],
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 20),
@@ -99,33 +110,35 @@ class RecentCell extends GetView<RecentsController> {
                         blurRadius: 25)
                   ],
                 ),
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: CircleAvatar(
-                        backgroundColor: Colors.grey,
-                        backgroundImage: getUserImage(recent.withUser),
-                      ),
-                    ),
-                    recent.counter != 0
-                        ? Align(
-                            alignment: Alignment.topRight,
-                            child: Container(
-                              height: 15,
-                              width: 15,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 3,
-                                ),
-                                shape: BoxShape.circle,
-                                color: Colors.green,
-                              ),
+                child: recent.type == RecentType.private
+                    ? Stack(
+                        children: [
+                          Positioned.fill(
+                            child: CircleAvatar(
+                              backgroundColor: Colors.grey,
+                              backgroundImage: getUserImage(recent.withUser!),
                             ),
-                          )
-                        : Container(),
-                  ],
-                ),
+                          ),
+                          recent.counter != 0
+                              ? Align(
+                                  alignment: Alignment.topRight,
+                                  child: Container(
+                                    height: 15,
+                                    width: 15,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 3,
+                                      ),
+                                      shape: BoxShape.circle,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                )
+                              : Container(),
+                        ],
+                      )
+                    : Container(),
               ),
               SizedBox(
                 width: 20,
@@ -134,15 +147,17 @@ class RecentCell extends GetView<RecentsController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    recent.withUser.name,
-                    style: TextStyle(
-                      color: Color(0xff686795),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
+                  recent.type == RecentType.private
+                      ? Text(
+                          recent.withUser!.name,
+                          style: TextStyle(
+                            color: Color(0xff686795),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1.5,
+                          ),
+                        )
+                      : Container(),
                   SizedBox(
                     height: 5,
                   ),

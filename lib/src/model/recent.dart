@@ -20,7 +20,7 @@ class Recent {
 
   final String? withUserId;
   FBUser? withUser;
-  final String? groupId;
+
   Group? group;
 
   String get formattedTime {
@@ -28,10 +28,10 @@ class Recent {
   }
 
   RecentType get type {
-    if (groupId != null) {
-      return RecentType.group;
+    if (withUserId != null) {
+      return RecentType.private;
     }
-    return RecentType.private;
+    return RecentType.group;
   }
 
   Recent({
@@ -42,7 +42,6 @@ class Recent {
     required this.counter,
     required this.date,
     this.withUserId,
-    this.groupId,
   });
 
   factory Recent.fromDocument(DocumentSnapshot map) {
@@ -56,10 +55,6 @@ class Recent {
       withUserId:
           (map.data() as Map<String, dynamic>).containsKey(RecentKey.withUserId)
               ? map[RecentKey.withUserId]
-              : null,
-      groupId:
-          (map.data() as Map<String, dynamic>).containsKey(RecentKey.groupId)
-              ? map[RecentKey.groupId]
               : null,
     );
   }
@@ -76,10 +71,6 @@ class Recent {
 
     if (withUserId != null) {
       map[RecentKey.withUserId] = withUserId;
-    }
-
-    if (groupId != null) {
-      map[RecentKey.groupId] = groupId;
     }
 
     return map;
@@ -180,11 +171,7 @@ Future<Group> createGroupChat(List<FBUser> members) async {
 
   group.members.forEach(
     (user) {
-      firebaseRef(FirebaseRef.group)
-          .doc(user.uid)
-          .collection(GroupKey.kGroup)
-          .doc(id)
-          .set(group.toMap());
+      firebaseRef(FirebaseRef.group).doc(group.id).set(group.toMap());
     },
   );
 

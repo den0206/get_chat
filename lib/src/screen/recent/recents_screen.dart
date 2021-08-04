@@ -94,24 +94,24 @@ class RecentCell extends GetView<RecentsController> {
           margin: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
           child: Row(
             children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 3,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.grey.withOpacity(.3),
-                        offset: Offset(0, 5),
-                        blurRadius: 25)
-                  ],
-                ),
-                child: recent.type == RecentType.private
-                    ? Stack(
+              recent.type == RecentType.private
+                  ? Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 3,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.grey.withOpacity(.3),
+                              offset: Offset(0, 5),
+                              blurRadius: 25)
+                        ],
+                      ),
+                      child: Stack(
                         children: [
                           Positioned.fill(
                             child: CircleAvatar(
@@ -137,9 +137,29 @@ class RecentCell extends GetView<RecentsController> {
                                 )
                               : Container(),
                         ],
-                      )
-                    : Container(),
-              ),
+                      ))
+                  : Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Container(
+                        height: 50,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: recent.group!.members.length,
+                          itemBuilder: (context, index) {
+                            return Align(
+                              widthFactor: 0.4,
+                              child: CircleAvatar(
+                                radius: 20,
+                                backgroundColor: Colors.grey,
+                                backgroundImage:
+                                    getUserImage(recent.group!.members[index]),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
               SizedBox(
                 width: 20,
               ),
@@ -147,17 +167,18 @@ class RecentCell extends GetView<RecentsController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  recent.type == RecentType.private
-                      ? Text(
-                          recent.withUser!.name,
-                          style: TextStyle(
-                            color: Color(0xff686795),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1.5,
-                          ),
-                        )
-                      : Container(),
+                  Text(
+                    recent.type == RecentType.private
+                        ? recent.withUser!.name
+                        : recent.group?.title ?? "Group",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xff686795),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
                   SizedBox(
                     height: 5,
                   ),

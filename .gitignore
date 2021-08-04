@@ -49,5 +49,6 @@ app.*.map.json
 /ios
 /android
 /assets
+/test
 
 

@@ -1,5 +1,4 @@
 import 'package:getx_chat/src/model/fb_user.dart';
-import 'package:getx_chat/src/screen/auth/auth_controller.dart';
 
 class Group {
   ///chatRoomid

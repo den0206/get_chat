@@ -3,7 +3,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:get/instance_manager.dart';
 import 'package:getx_chat/src/model/recent.dart';
-import 'package:getx_chat/src/screen/message/message_screen.dart';
 import 'package:getx_chat/src/screen/recent/recents_controller.dart';
 import 'package:get/get.dart';
 import 'package:getx_chat/src/screen/users/users_screen.dart';
@@ -84,11 +83,7 @@ class RecentCell extends GetView<RecentsController> {
       ],
       child: InkWell(
         onTap: () async {
-          final argumants = [recent.chatRoomId, recent.withUser];
-          final _ =
-              await Get.toNamed(MessageScreen.routeName, arguments: argumants);
-
-          controller.resetCounter(recent);
+          await controller.pushMessage(recent);
         },
         child: Container(
           margin: EdgeInsets.symmetric(vertical: 10, horizontal: 5),

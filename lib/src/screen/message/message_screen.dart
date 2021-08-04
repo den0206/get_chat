@@ -97,37 +97,37 @@ class MessageScreen extends GetView<MessageController> {
         child: SizedBox(
           height: 250,
           child: EmojiPicker(
-              onEmojiSelected: (category, emoji) {
-                controller.tC
-                  ..text += emoji.emoji
-                  ..selection = TextSelection.fromPosition(
-                      TextPosition(offset: controller.tC.text.length));
-              },
-              onBackspacePressed: () {
-                controller.tC
-                  ..text = controller.tC.text.characters.skipLast(1).toString()
-                  ..selection = TextSelection.fromPosition(
-                      TextPosition(offset: controller.tC.text.length));
-              },
-              config: Config(
-                  columns: 7,
-                  emojiSizeMax: 32.0,
-                  verticalSpacing: 0,
-                  horizontalSpacing: 0,
-                  initCategory: Category.RECENT,
-                  bgColor: Color(0xFFF2F2F2),
-                  indicatorColor: Colors.blue,
-                  iconColor: Colors.grey,
-                  iconColorSelected: Colors.blue,
-                  progressIndicatorColor: Colors.blue,
-                  backspaceColor: Colors.blue,
-                  showRecentsTab: true,
-                  recentsLimit: 28,
-                  noRecentsText: 'No Recents',
-                  noRecentsStyle:
-                      TextStyle(fontSize: 20, color: Colors.black26),
-                  categoryIcons: CategoryIcons(),
-                  buttonMode: ButtonMode.MATERIAL)),
+            onEmojiSelected: (category, emoji) {
+              controller.tC
+                ..text += emoji.emoji
+                ..selection = TextSelection.fromPosition(
+                    TextPosition(offset: controller.tC.text.length));
+            },
+            onBackspacePressed: () {
+              controller.tC
+                ..text = controller.tC.text.characters.skipLast(1).toString()
+                ..selection = TextSelection.fromPosition(
+                    TextPosition(offset: controller.tC.text.length));
+            },
+            config: Config(
+                columns: 7,
+                emojiSizeMax: 32.0,
+                verticalSpacing: 0,
+                horizontalSpacing: 0,
+                initCategory: Category.RECENT,
+                bgColor: Color(0xFFF2F2F2),
+                indicatorColor: Colors.blue,
+                iconColor: Colors.grey,
+                iconColorSelected: Colors.blue,
+                progressIndicatorColor: Colors.blue,
+                backspaceColor: Colors.blue,
+                showRecentsTab: true,
+                recentsLimit: 28,
+                noRecentsText: 'No Recents',
+                noRecentsStyle: TextStyle(fontSize: 20, color: Colors.black26),
+                categoryIcons: CategoryIcons(),
+                buttonMode: ButtonMode.MATERIAL),
+          ),
         ),
       ),
     );
@@ -140,13 +140,13 @@ class MessageScreen extends GetView<MessageController> {
       elevation: 0,
       backgroundColor: Colors.transparent,
       title: Row(
-        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          CircleAvatar(
-            backgroundColor: Colors.grey,
-            radius: 30,
-            backgroundImage: getUserImage(controller.withUser),
-          ),
+          if (controller.isPrivate)
+            CircleAvatar(
+              backgroundColor: Colors.grey,
+              radius: 30,
+              backgroundImage: getUserImage(controller.withUsers[0]),
+            ),
           SizedBox(
             width: 20,
           ),
@@ -154,7 +154,7 @@ class MessageScreen extends GetView<MessageController> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                controller.withUser.name,
+                controller.isPrivate ? controller.withUsers[0].name : "Group",
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -208,7 +208,8 @@ class MessageCell extends GetView<MessageController> {
                 CircleAvatar(
                   backgroundColor: Colors.grey,
                   radius: 15,
-                  backgroundImage: getUserImage(controller.withUser),
+                  backgroundImage:
+                      getUserImage(controller.getMessageUser(message.userId)),
                 ),
               SizedBox(
                 width: 10,
@@ -390,49 +391,3 @@ class MessageInput extends GetView<MessageController> {
     );
   }
 }
-
-/// menu button
-// CupertinoContextMenu(
-//   child: Container(
-//     height: 20,
-//     width: 20,
-//     decoration: BoxDecoration(
-//       border: Border.all(color: Colors.white, width: 2),
-//       shape: BoxShape.circle,
-//       color: Colors.grey,
-//     ),
-//     child: Icon(
-//       Icons.menu,
-//       color: Colors.white,
-//       size: 10,
-//     ),
-//   ),
-//   actions: [
-//     CupertinoContextMenuAction(
-//       isDefaultAction: true,
-//       child: const Text('Copy'),
-//       onPressed: () {
-//         print("Copy");
-//       },
-//     ),
-//     if (message.isCurrent)
-//       CupertinoContextMenuAction(
-//         isDefaultAction: true,
-//         child: const Text(
-//           'Delete',
-//           style: TextStyle(
-//             color: Colors.red,
-//           ),
-//         ),
-//         onPressed: () {
-//           controller.deleteMessage(message);
-//         },
-//       ),
-//     CupertinoContextMenuAction(
-//       child: const Text('Cancel'),
-//       onPressed: () {
-//         Navigator.pop(context);
-//       },
-//     ),
-//   ],
-// )

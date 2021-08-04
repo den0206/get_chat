@@ -15,8 +15,7 @@ import 'package:uuid/uuid.dart';
 
 class MessageExtentionService {
   late final String chatRoomId;
-  late final List<FBUser> withUses;
-  FBUser get withUser => withUses.first;
+  late final List<FBUser> withUsers;
 
   final currentUser = Get.find<AuthController>().current;
   final int limit = 10;
@@ -25,7 +24,7 @@ class MessageExtentionService {
 
   MessageExtentionService({
     required this.chatRoomId,
-    required this.withUses,
+    required this.withUsers,
   });
 
   /// load
@@ -143,7 +142,10 @@ class MessageExtentionService {
       videoUrl: videoUrl ?? null,
     );
 
-    [currentUser, withUser].forEach((user) async {
+    final users = withUsers;
+    users.insert(0, currentUser);
+
+    users.forEach((user) async {
       await firebaseRef(FirebaseRef.message)
           .doc(user.uid)
           .collection(chatRoomId)
@@ -181,8 +183,10 @@ class MessageExtentionService {
           },
         );
       }
+      final users = withUsers;
+      users.insert(0, currentUser);
 
-      [currentUser, withUser].forEach(
+      users.forEach(
         (user) async {
           await firebaseRef(FirebaseRef.message)
               .doc(user.uid)

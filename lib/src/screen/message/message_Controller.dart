@@ -27,7 +27,11 @@ class MessageBinding extends Bindings {
 class MessageController extends GetxController {
   /// arg
   final String chatRoomId = Get.arguments[0];
-  final FBUser withUser = Get.arguments[1];
+  final List<FBUser> withUsers = Get.arguments[1];
+
+  bool get isPrivate {
+    return withUsers.length == 1;
+  }
 
   final currentUser = Get.find<AuthController>().current;
 
@@ -50,7 +54,7 @@ class MessageController extends GetxController {
   void onInit() {
     super.onInit();
     searvice =
-        MessageExtentionService(chatRoomId: chatRoomId, withUses: [withUser]);
+        MessageExtentionService(chatRoomId: chatRoomId, withUsers: withUsers);
 
     listenFocus();
     newChatListner();
@@ -190,6 +194,12 @@ extension MessageControllerExtension on MessageController {
     });
   }
 
+  FBUser getMessageUser(String uid) {
+    final index = withUsers.indexWhere((user) => user.uid == uid);
+
+    return withUsers[index];
+  }
+
   void newChatListner() {
     final _subscription = firebaseRef(FirebaseRef.message)
         .doc(currentUser.uid)
@@ -221,6 +231,7 @@ extension MessageControllerExtension on MessageController {
   }
 
   void readListner(List<String> unreads) {
+    /// only private
     if (unreads.isEmpty) {
       return;
     }
@@ -252,7 +263,11 @@ extension MessageControllerExtension on MessageController {
   }
 
   void updateReadStatus(Message tempMessage) {
-    final users = [currentUser, withUser];
+    if (withUsers.length != 1) {
+      return;
+    }
+
+    final users = [currentUser, withUsers.first];
 
     if (!tempMessage.read) {
       final data = {MessageKey.read: true};

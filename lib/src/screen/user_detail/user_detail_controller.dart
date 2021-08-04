@@ -36,7 +36,10 @@ class UserDetailController extends GetxController {
     Get.back();
     Get.find<MainTabController>().setIndex(0);
 
-    final arguments = [chatRoomId, user];
+    final arguments = [
+      chatRoomId,
+      [user],
+    ];
     Get.toNamed(MessageScreen.routeName, arguments: arguments);
   }
 }

@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
+import 'package:getx_chat/src/model/fb_user.dart';
 import 'package:getx_chat/src/model/recent.dart';
 import 'package:get/get.dart';
-import 'package:getx_chat/src/screen/auth/auth_controller.dart';
+import 'package:getx_chat/src/screen/message/message_screen.dart';
 import 'package:getx_chat/src/service/recent_extention.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
 import 'package:getx_chat/src/widgets/custom_dialog.dart';
@@ -51,45 +52,50 @@ class RecentsController extends GetxController {
   }
 
   void recentListner() {
-    final _subscription = firebaseRef(FirebaseRef.recent)
-        .where(RecentKey.userId, isEqualTo: AuthController.to.current.uid)
-        .where(RecentKey.date, isGreaterThan: Timestamp.now())
-        .snapshots(includeMetadataChanges: true)
-        .listen(
-      (data) {
-        final List<DocumentChange> documentChange = data.docChanges;
+    final _subscription = searvice.addReadListner(
+      (tempRecent) {
+        if (!recents.map((recent) => recent.id).contains(tempRecent.id)) {
+          if (tempRecent.withUserId != null) {
+            tempRecent.onUserCallback(
+              (user) {
+                tempRecent.withUser = user;
+                recents.insert(0, tempRecent);
+              },
+            );
+          }
+        } else {
+          int index =
+              recents.indexWhere((recent) => recent.id == tempRecent.id);
 
-        documentChange.forEach(
-          (recentChange) {
-            final tempRecent = Recent.fromDocument(recentChange.doc);
+          final oldRecents = recents[index];
+          if (oldRecents.withUser != null) {
+            tempRecent.withUser = oldRecents.withUser;
+          }
 
-            if (!recents.map((recent) => recent.id).contains(tempRecent.id)) {
-              if (tempRecent.withUserId != null) {
-                tempRecent.onUserCallback(
-                  (user) {
-                    tempRecent.withUser = user;
-                    recents.insert(0, tempRecent);
-                  },
-                );
-              }
-            } else {
-              int index =
-                  recents.indexWhere((recent) => recent.id == tempRecent.id);
-
-              final oldRecents = recents[index];
-              if (oldRecents.withUser != null) {
-                tempRecent.withUser = oldRecents.withUser;
-              }
-
-              recents[index] = tempRecent;
-              recents.sort((a, b) => b.date.compareTo(a.date));
-            }
-          },
-        );
+          recents[index] = tempRecent;
+          recents.sort((a, b) => b.date.compareTo(a.date));
+        }
       },
     );
 
     listners.add(_subscription);
+  }
+
+  Future pushMessage(Recent recent) async {
+    List<FBUser> argumentUser = [];
+    switch (recent.type) {
+      case RecentType.private:
+        argumentUser.add(recent.withUser!);
+        break;
+      case RecentType.group:
+        argumentUser.addAll(recent.group!.members);
+        break;
+    }
+
+    final argumants = [recent.chatRoomId, argumentUser];
+    final _ = await Get.toNamed(MessageScreen.routeName, arguments: argumants);
+
+    resetCounter(recent);
   }
 
   void resetCounter(Recent tempRecent) {
@@ -97,6 +103,7 @@ class RecentsController extends GetxController {
     final oldRecent = recents[index];
 
     if (oldRecent.counter != 0) {
+      print("Reset Counter");
       tempRecent.counter = 0;
       recents[index] = tempRecent;
 
@@ -112,29 +119,3 @@ class RecentsController extends GetxController {
     recents.remove(recent);
   }
 }
-
-
-
-  // Stream<List<Recent>> toRelation() async* {
-  //   var q = firebaseRef(FirebaseRef.recent)
-  //       .where(RecentKey.userId, isEqualTo: searvice.currentUser)
-  //       .snapshots();
-
-  //   await for (var recentSnapshot in q) {
-  //     for (var doc in recentSnapshot.docChanges) {
-  //       Recent recent;
-  //       if (doc.doc[RecentKey.withUserId] != null) {
-  //         var userSnapshot = await firebaseRef(FirebaseRef.user)
-  //             .doc(doc.doc[RecentKey.withUserId])
-  //             .get();
-  //         recent = Recent.fromDocument(doc.doc);
-  //         recent.withUser = FBUser.fromMap(userSnapshot);
-  //       } else {
-  //         recent = Recent.fromDocument(doc.doc);
-  //       }
-  //       recents.add(recent);
-  //     }
-  //   }
-
-  //   yield recents;
-  // }

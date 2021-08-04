@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:getx_chat/src/model/fb_user.dart';
+import 'package:getx_chat/src/model/group.dart';
 import 'package:getx_chat/src/model/recent.dart';
 import 'package:get/get.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
@@ -67,11 +68,42 @@ class RecentsController extends GetxController {
     List<Recent> tempRecent = [];
 
     for (var doc in snapshots.docs) {
-      var userSnapshot = await firebaseRef(FirebaseRef.user)
-          .doc(doc[RecentKey.withUserId])
-          .get();
-      Recent recent = Recent.fromMap(doc);
-      recent.withUser = FBUser.fromMap(userSnapshot);
+      Recent recent = Recent.fromDocument(doc);
+
+      if (recent.type == RecentType.private) {
+        var userSnapshot = await firebaseRef(FirebaseRef.user)
+            .doc(doc[RecentKey.withUserId])
+            .get();
+
+        recent.withUser = FBUser.fromMap(userSnapshot);
+      } else {
+        var groupSnapchat = await firebaseRef(FirebaseRef.group)
+            .doc(auth.current.uid)
+            .collection(GroupKey.kGroup)
+            .doc(recent.groupId)
+            .get();
+
+        final memberIds = List<String>.from(groupSnapchat[GroupKey.memberIds]);
+
+        List<FBUser> member = [];
+
+        await Future.forEach(memberIds, (String id) async {
+          if (id != auth.current.uid) {
+            var userSnapshot =
+                await firebaseRef(FirebaseRef.user).doc(id).get();
+
+            member.add(FBUser.fromMap(userSnapshot));
+          }
+        });
+
+        member.insert(0, auth.current);
+        recent.group = Group(
+          id: groupSnapchat[GroupKey.id],
+          ownerId: groupSnapchat[GroupKey.ownerId],
+          members: member,
+        );
+        print(recent.group!.members.length);
+      }
 
       tempRecent.add(recent);
     }
@@ -90,15 +122,17 @@ class RecentsController extends GetxController {
 
         documentChange.forEach(
           (recentChange) {
-            final tempRecent = Recent.fromMap(recentChange.doc);
+            final tempRecent = Recent.fromDocument(recentChange.doc);
 
             if (!recents.map((recent) => recent.id).contains(tempRecent.id)) {
-              tempRecent.onUserCallback(
-                (user) {
-                  tempRecent.withUser = user;
-                  recents.insert(0, tempRecent);
-                },
-              );
+              if (tempRecent.withUserId != null) {
+                tempRecent.onUserCallback(
+                  (user) {
+                    tempRecent.withUser = user;
+                    recents.insert(0, tempRecent);
+                  },
+                );
+              }
             } else {
               int index =
                   recents.indexWhere((recent) => recent.id == tempRecent.id);
@@ -150,10 +184,10 @@ class RecentsController extends GetxController {
           var userSnapshot = await firebaseRef(FirebaseRef.user)
               .doc(doc.doc[RecentKey.withUserId])
               .get();
-          recent = Recent.fromMap(doc.doc);
+          recent = Recent.fromDocument(doc.doc);
           recent.withUser = FBUser.fromMap(userSnapshot);
         } else {
-          recent = Recent.fromMap(doc.doc);
+          recent = Recent.fromDocument(doc.doc);
         }
         recents.add(recent);
       }

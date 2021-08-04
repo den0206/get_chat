@@ -45,39 +45,44 @@ class Recent {
     this.groupId,
   });
 
-  factory Recent.fromMap(DocumentSnapshot map) {
-    final rec = Recent(
+  factory Recent.fromDocument(DocumentSnapshot map) {
+    return Recent(
       id: map[RecentKey.id],
       userId: map[RecentKey.userId],
-      withUserId: map[RecentKey.withUserId],
       chatRoomId: map[RecentKey.chatRoomId],
       lastMessage: map[RecentKey.lastMessage],
       counter: map[RecentKey.counter],
       date: map[RecentKey.date],
+      withUserId:
+          (map.data() as Map<String, dynamic>).containsKey(RecentKey.withUserId)
+              ? map[RecentKey.withUserId]
+              : null,
+      groupId:
+          (map.data() as Map<String, dynamic>).containsKey(RecentKey.groupId)
+              ? map[RecentKey.groupId]
+              : null,
     );
-
-    // firebaseRef(FirebaseRef.user).doc(map[RecentKey.withUserId]).get().then(
-    //   (doc) {
-    //     final user = FBUser.fromMap(doc);
-    //     rec.withUser = user;
-    //     print(rec.withUser);
-    //     return rec;
-    //   },
-    // );
-
-    return rec;
   }
 
   Map<String, dynamic> toMap() {
-    return {
+    Map<String, dynamic> map = {
       RecentKey.id: id,
       RecentKey.userId: userId,
-      RecentKey.withUserId: withUserId,
       RecentKey.chatRoomId: chatRoomId,
       RecentKey.lastMessage: lastMessage,
       RecentKey.counter: counter,
       RecentKey.date: date,
     };
+
+    if (withUserId != null) {
+      map[RecentKey.withUserId] = withUserId;
+    }
+
+    if (groupId != null) {
+      map[RecentKey.groupId] = groupId;
+    }
+
+    return map;
   }
 
   Future<void> onUserCallback(Function(FBUser user) onScucess) async {
@@ -97,6 +102,8 @@ class RecentKey {
   static final lastMessage = "lastMessage";
   static final counter = "counter";
   static final date = "date";
+
+  static final groupId = "groupId";
 }
 
 Future<String> createChatRoom(
@@ -138,6 +145,28 @@ Future<String> createChatRoom(
   return chatRoomId;
 }
 
+void createRecentFirestore(
+    String uid, String currentUID, List<FBUser> users, String chatRoomId) {
+  final ref = firebaseRef(FirebaseRef.recent).doc();
+  final id = ref.id;
+
+  final withUser = uid == currentUID ? users.last : users.first;
+
+  final Map<String, dynamic> data = {
+    RecentKey.id: id,
+    RecentKey.userId: uid,
+    RecentKey.withUserId: withUser.uid,
+    RecentKey.chatRoomId: chatRoomId,
+    RecentKey.lastMessage: "",
+    RecentKey.counter: 0,
+    RecentKey.date: Timestamp.now(),
+  };
+
+  ref.set(data);
+}
+
+/// group
+
 Future<Group> createGroupChat(List<FBUser> members) async {
   final id = Uuid().v4();
   final owner = AuthController.to.current;
@@ -162,24 +191,25 @@ Future<Group> createGroupChat(List<FBUser> members) async {
   return group;
 }
 
-void createRecentFirestore(
-    String uid, String currentUID, List<FBUser> users, String chatRoomId) {
-  final ref = firebaseRef(FirebaseRef.recent).doc();
-  final id = ref.id;
+void createGroupRecent(Group group) {
+  group.members.forEach(
+    (user) {
+      final ref = firebaseRef(FirebaseRef.recent).doc();
+      final id = ref.id;
 
-  final withUser = uid == currentUID ? users.last : users.first;
+      final Map<String, dynamic> data = {
+        RecentKey.id: id,
+        RecentKey.userId: user.uid,
+        RecentKey.chatRoomId: group.id,
+        RecentKey.groupId: group.id,
+        RecentKey.lastMessage: "",
+        RecentKey.counter: 0,
+        RecentKey.date: Timestamp.now(),
+      };
 
-  final Map<String, dynamic> data = {
-    RecentKey.id: id,
-    RecentKey.userId: uid,
-    RecentKey.withUserId: withUser.uid,
-    RecentKey.chatRoomId: chatRoomId,
-    RecentKey.lastMessage: "",
-    RecentKey.counter: 0,
-    RecentKey.date: Timestamp.now(),
-  };
-
-  ref.set(data);
+      ref.set(data);
+    },
+  );
 }
 
 Future<void> updateRecent(String chatRoomId, String lastMessage,
@@ -191,7 +221,7 @@ Future<void> updateRecent(String chatRoomId, String lastMessage,
   if (q.docs.isNotEmpty)
     q.docs.forEach(
       (doc) {
-        final recent = Recent.fromMap(doc);
+        final recent = Recent.fromDocument(doc);
         updateRecentToFirestore(recent, lastMessage, isDelete);
       },
     );

@@ -71,7 +71,7 @@ class UsersController extends GetxController {
     }
 
     final group = await createGroupChat(selectedUsers);
-    print(group.members.length);
+    createGroupRecent(group);
     selectedUsers.clear();
   }
 

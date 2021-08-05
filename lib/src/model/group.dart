@@ -1,4 +1,5 @@
 import 'package:getx_chat/src/model/fb_user.dart';
+import 'package:getx_chat/src/screen/auth/auth_controller.dart';
 
 class Group {
   ///chatRoomid
@@ -6,6 +7,10 @@ class Group {
   final String ownerId;
   final String? title;
   final List<FBUser> members;
+
+  bool get isOwner {
+    return ownerId == AuthController.to.current.uid;
+  }
 
   Group({
     required this.id,

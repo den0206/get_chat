@@ -1,10 +1,10 @@
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:getx_chat/src/model/fb_user.dart';
 import 'package:get/get.dart';
-import 'package:getx_chat/src/model/recent.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
 import 'package:getx_chat/src/screen/common/main_tab_controller.dart';
 import 'package:getx_chat/src/screen/message/message_screen.dart';
+import 'package:getx_chat/src/service/create_recent.dart';
 
 class UserDetailBinding implements Bindings {
   @override
@@ -16,6 +16,8 @@ class UserDetailBinding implements Bindings {
 class UserDetailController extends GetxController {
   final FBUser user = Get.arguments;
   final AuthController auth = Get.find();
+
+  final CreateRecentService cR = CreateRecentService();
 
   bool get isCurrent => user.uid == auth.currentUser?.uid;
 
@@ -29,7 +31,7 @@ class UserDetailController extends GetxController {
       return;
     }
 
-    final chatRoomId = await createChatRoom(AuthController.to.current.uid,
+    final chatRoomId = await cR.createChatRoom(AuthController.to.current.uid,
         user.uid, [AuthController.to.current, user]);
 
     /// present message screen

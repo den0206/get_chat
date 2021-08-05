@@ -54,14 +54,17 @@ class RecentsController extends GetxController {
   void recentListner() {
     final _subscription = searvice.addReadListner(
       (tempRecent) {
-        if (!recents.map((recent) => recent.id).contains(tempRecent.id)) {
+        if ((!recents.map((recent) => recent.id).contains(tempRecent.id))) {
           if (tempRecent.withUserId != null) {
-            tempRecent.onUserCallback(
-              (user) {
-                tempRecent.withUser = user;
-                recents.insert(0, tempRecent);
-              },
-            );
+            tempRecent.setWithUser((user) {
+              tempRecent.withUser = user;
+              recents.insert(0, tempRecent);
+            });
+          } else {
+            tempRecent.setGroup((group) {
+              tempRecent.group = group;
+              recents.insert(0, tempRecent);
+            });
           }
         } else {
           int index =
@@ -70,6 +73,8 @@ class RecentsController extends GetxController {
           final oldRecents = recents[index];
           if (oldRecents.withUser != null) {
             tempRecent.withUser = oldRecents.withUser;
+          } else {
+            tempRecent.group = oldRecents.group;
           }
 
           recents[index] = tempRecent;

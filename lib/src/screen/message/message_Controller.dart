@@ -93,7 +93,7 @@ class MessageController extends GetxController {
       messages.forEach(
         (message) {
           if (!message.isCurrent && !message.read) {
-            updateReadStatus(message);
+            updateYourReadStatus(message);
           }
         },
       );
@@ -201,69 +201,42 @@ extension MessageControllerExtension on MessageController {
   }
 
   void newChatListner() {
-    final _subscription = firebaseRef(FirebaseRef.message)
-        .doc(currentUser.uid)
-        .collection(chatRoomId)
-        .where(MessageKey.date, isGreaterThan: Timestamp.now())
-        .snapshots()
-        .listen(
-      (data) {
-        final List<DocumentChange> documentChanges = data.docChanges;
-        documentChanges.forEach(
-          (messageChange) {
-            final message = Message.fromMap(messageChange.doc);
-            if (messageChange.type == DocumentChangeType.added) {
-              if (!messages.contains(message)) {
-                print("add");
-                messages.insert(0, message);
+    final _subscription = searvice.newChatListner((newMessage) {
+      if (!messages.contains(newMessage)) {
+        print("Message add");
+        messages.insert(0, newMessage);
 
-                if (!message.isCurrent && !message.read) {
-                  updateReadStatus(message);
-                }
-              }
-            }
-          },
-        );
-      },
-    );
+        if (!newMessage.isCurrent && !newMessage.read) {
+          updateYourReadStatus(newMessage);
+        }
+      }
+    });
 
     listners.add(_subscription);
   }
 
   void readListner(List<String> unreads) {
     /// only private
-    if (unreads.isEmpty) {
+    if (unreads.isEmpty || !isPrivate) {
       return;
     }
 
-    final _subscription = firebaseRef(FirebaseRef.message)
-        .doc(currentUser.uid)
-        .collection(chatRoomId)
-        .where(MessageKey.id, whereIn: unreads)
-        .snapshots()
-        .listen(
-      (data) {
-        final List<DocumentChange> documentChanges = data.docChanges;
-        documentChanges.forEach((messageChange) {
-          if (messageChange.type == DocumentChangeType.modified) {
-            int indexWhere = messages.indexWhere((message) {
-              return messageChange.doc.id == message.id;
-            });
+    final _subscription = searvice.readListner(unreads, (tempMessage) {
+      print("Message Edit");
+      int index =
+          messages.indexWhere((message) => message.id == tempMessage.id);
 
-            if (indexWhere >= 0) {
-              messages[indexWhere] = Message.fromMap(messageChange.doc);
-            }
-          }
-        });
-      },
-    );
+      if (index >= 0) {
+        messages[index] = tempMessage;
+      }
+    });
 
     listners.add(_subscription);
-    print(listners.length);
+    print("cuttentlistner is ${listners.length}");
   }
 
-  void updateReadStatus(Message tempMessage) {
-    if (withUsers.length != 1) {
+  void updateYourReadStatus(Message tempMessage) {
+    if (!isPrivate) {
       return;
     }
 

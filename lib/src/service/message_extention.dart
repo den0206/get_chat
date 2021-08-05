@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -200,5 +201,90 @@ class MessageExtentionService {
     } catch (e) {
       rethrow;
     }
+  }
+
+  /// listners
+  StreamSubscription<QuerySnapshot> newChatListner(
+      Function(Message newMessage) onAdd) {
+    final _subscription = firebaseRef(FirebaseRef.message)
+        .doc(currentUser.uid)
+        .collection(chatRoomId)
+        .where(MessageKey.date, isGreaterThan: Timestamp.now())
+        .snapshots()
+        .listen((data) {
+      final List<DocumentChange> documentChanges = data.docChanges;
+      documentChanges.forEach(
+        (messageChange) {
+          final message = Message.fromMap(messageChange.doc);
+          if (messageChange.type == DocumentChangeType.added) {
+            onAdd(message);
+          }
+        },
+      );
+    });
+
+    return _subscription;
+  }
+
+  StreamSubscription<QuerySnapshot> readListner(
+      List<String> unreads, Function(Message tempMessage) onChane) {
+    final _subscription = firebaseRef(FirebaseRef.message)
+        .doc(currentUser.uid)
+        .collection(chatRoomId)
+        .where(MessageKey.id, whereIn: unreads)
+        .snapshots()
+        .listen((data) {
+      final List<DocumentChange> documentChanges = data.docChanges;
+      documentChanges.forEach((messageChange) {
+        final tempMessage = Message.fromMap(messageChange.doc);
+        onChane(tempMessage);
+      });
+    });
+
+    return _subscription;
+  }
+
+  /// update Recent
+
+  Future<void> updateRecent(String chatRoomId, String lastMessage,
+      [bool isDelete = false]) async {
+    final q = await firebaseRef(FirebaseRef.recent)
+        .where(RecentKey.chatRoomId, isEqualTo: chatRoomId)
+        .get();
+
+    if (q.docs.isNotEmpty)
+      q.docs.forEach(
+        (doc) {
+          final recent = Recent.fromDocument(doc);
+          _updateRecentToFirestore(recent, lastMessage, isDelete);
+        },
+      );
+  }
+
+  void _updateRecentToFirestore(
+      Recent recent, String lastMessage, bool isDelete) {
+    final date = Timestamp.now();
+    final uid = recent.userId;
+    final currentUid = Get.find<AuthController>().current.uid;
+    var counter = recent.counter;
+
+    if (currentUid != uid) {
+      if (!isDelete) {
+        ++counter;
+      } else {
+        --counter;
+        if (counter < 0) {
+          counter = 0;
+        }
+      }
+    }
+
+    final value = {
+      RecentKey.lastMessage: lastMessage,
+      RecentKey.counter: counter,
+      RecentKey.date: date
+    };
+
+    firebaseRef(FirebaseRef.recent).doc(recent.id).update(value);
   }
 }

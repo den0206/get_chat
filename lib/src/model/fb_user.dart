@@ -1,10 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:getx_chat/src/screen/auth/auth_controller.dart';
 
 class FBUser {
   String uid;
   String name;
   String email;
   String imageUrl;
+
+  bool get isCurrent {
+    return uid == AuthController.to.current.uid;
+  }
 
   FBUser({
     required this.uid,

@@ -1,12 +1,17 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:get/instance_manager.dart';
 import 'package:getx_chat/src/model/recent.dart';
+import 'package:getx_chat/src/screen/auth/auth_controller.dart';
 import 'package:getx_chat/src/screen/recent/recents_controller.dart';
 import 'package:get/get.dart';
+import 'package:getx_chat/src/screen/user_detail/user_detail_controller.dart';
+import 'package:getx_chat/src/screen/user_detail/user_detail_sceen.dart';
 import 'package:getx_chat/src/screen/users/users_screen.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
+import 'package:getx_chat/src/widgets/overlap_avatars.dart';
 
 class RecentsScreen extends GetView<RecentsController> {
   RecentsScreen({Key? key}) : super(key: key);
@@ -21,7 +26,28 @@ class RecentsScreen extends GetView<RecentsController> {
         toolbarHeight: 70,
         elevation: 0,
         backgroundColor: Colors.transparent,
-        title: Text('Recents'),
+        title: Row(
+          children: [
+            InkWell(
+              child: CircleAvatar(
+                radius: 20,
+                backgroundImage: getUserImage(AuthController.to.current),
+              ),
+              onTap: () {
+                Get.to(
+                  UserDetailScreen(),
+                  fullscreenDialog: true,
+                  binding: UserDetailBinding(),
+                  arguments: AuthController.to.current,
+                  transition: Transition.cupertinoDialog,
+                );
+              },
+            ),
+            Spacer(),
+            Text('Recents'),
+            Spacer()
+          ],
+        ),
         actions: [
           IconButton(
             icon: Icon(
@@ -132,29 +158,9 @@ class RecentCell extends GetView<RecentsController> {
                                 )
                               : Container(),
                         ],
-                      ))
-                  : Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Container(
-                        height: 50,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          itemCount: recent.group!.members.length,
-                          itemBuilder: (context, index) {
-                            return Align(
-                              widthFactor: 0.4,
-                              child: CircleAvatar(
-                                radius: 20,
-                                backgroundColor: Colors.grey,
-                                backgroundImage:
-                                    getUserImage(recent.group!.members[index]),
-                              ),
-                            );
-                          },
-                        ),
                       ),
-                    ),
+                    )
+                  : OverlapAvatars(users: recent.group!.members),
               SizedBox(
                 width: 20,
               ),

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import 'package:getx_chat/src/model/fb_user.dart';
 import 'package:getx_chat/src/screen/users/users_controller.dart';
+import 'package:getx_chat/src/utils/firebaseRef.dart';
 
 class UsersScreen extends StatelessWidget {
   const UsersScreen({
@@ -59,13 +60,15 @@ class UsersScreen extends StatelessWidget {
               return UserCell(user: user);
             },
           ),
-          floatingActionButton: FloatingActionButton(
-            child: Icon(Icons.add),
-            backgroundColor: Colors.green,
-            onPressed: () {
-              controller.createGroup();
-            },
-          ),
+          floatingActionButton: !isPrivate
+              ? FloatingActionButton(
+                  child: Icon(Icons.add),
+                  backgroundColor: Colors.green,
+                  onPressed: () {
+                    controller.createGroup();
+                  },
+                )
+              : null,
         );
       },
     );
@@ -92,9 +95,7 @@ class UserCell extends GetView<UsersController> {
             tag: user.uid,
             child: CircleAvatar(
               backgroundColor: Colors.grey,
-              backgroundImage: user.imageUrl.isEmpty
-                  ? Image.asset("assets/images/defaultDark.png").image
-                  : NetworkImage(user.imageUrl),
+              backgroundImage: getUserImage(user),
               child: controller.checkSelected(user)
                   ? CircleAvatar(
                       child: Icon(

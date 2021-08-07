@@ -83,8 +83,10 @@ class UsersController extends GetxController {
     } else {
       if (!selectedUsers.contains(user)) {
         selectedUsers.add(user);
+        // users.remove(user);
       } else {
         selectedUsers.remove(user);
+        // users.add(user);
       }
     }
   }

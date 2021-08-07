@@ -236,8 +236,10 @@ class MessageExtentionService {
         .listen((data) {
       final List<DocumentChange> documentChanges = data.docChanges;
       documentChanges.forEach((messageChange) {
-        final tempMessage = Message.fromMap(messageChange.doc);
-        onChane(tempMessage);
+        if (messageChange.type == DocumentChangeType.modified) {
+          final tempMessage = Message.fromMap(messageChange.doc);
+          onChane(tempMessage);
+        }
       });
     });
 

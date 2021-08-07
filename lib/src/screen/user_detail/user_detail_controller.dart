@@ -2,7 +2,6 @@ import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:getx_chat/src/model/fb_user.dart';
 import 'package:get/get.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
-import 'package:getx_chat/src/screen/common/main_tab_controller.dart';
 import 'package:getx_chat/src/screen/message/message_screen.dart';
 import 'package:getx_chat/src/service/create_recent.dart';
 
@@ -35,8 +34,9 @@ class UserDetailController extends GetxController {
         user.uid, [AuthController.to.current, user]);
 
     /// present message screen
-    Get.back();
-    Get.find<MainTabController>().setIndex(0);
+    // Get.back();
+    Get.until((route) => route.isFirst);
+    // Get.find<MainTabController>().setIndex(0);
 
     final arguments = [
       chatRoomId,

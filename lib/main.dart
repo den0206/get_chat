@@ -5,6 +5,10 @@ import 'package:get/get.dart';
 import 'package:getx_chat/src/screen/auth/login/login_screen.dart';
 import 'package:getx_chat/src/screen/auth/signup/signup_controller.dart';
 import 'package:getx_chat/src/screen/auth/signup/signup_screen.dart';
+import 'package:getx_chat/src/screen/group_detail/group_detail_controller.dart';
+import 'package:getx_chat/src/screen/group_detail/group_detail_screen.dart';
+import 'package:getx_chat/src/screen/groups/groups_controller.dart';
+import 'package:getx_chat/src/screen/groups/groups_screen.dart';
 import 'package:getx_chat/src/screen/network_branch.dart/network_branch.dart';
 import 'package:getx_chat/src/screen/home/home_screen.dart';
 import 'package:getx_chat/src/screen/message/message_Controller.dart';
@@ -75,6 +79,16 @@ class MyApp extends StatelessWidget {
             isPrivate: false,
           ),
           fullscreenDialog: true,
+        ),
+        GetPage(
+          name: GroupsScreen.routeName,
+          page: () => GroupsScreen(),
+          binding: GroupsBinding(),
+        ),
+        GetPage(
+          name: GroupDetailScreen.routeName,
+          page: () => GroupDetailScreen(),
+          binding: GroupDetailBinding(),
         )
       ],
 

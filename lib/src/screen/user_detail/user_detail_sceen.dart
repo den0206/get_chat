@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:getx_chat/src/screen/groups/groups_screen.dart';
+
 import 'package:getx_chat/src/screen/network_branch.dart/network_branch.dart';
 import 'package:getx_chat/src/screen/user_detail/user_detail_controller.dart';
-import 'package:getx_chat/src/widgets/custom_button.dart';
+import 'package:getx_chat/src/widgets/detail_profile_space.dart';
 
 class UserDetailScreen extends GetView<UserDetailController> {
   const UserDetailScreen({
@@ -81,18 +83,26 @@ class UserDetailScreen extends GetView<UserDetailController> {
                               SizedBox(
                                 height: responsive.height * 0.03,
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  CustomButton(
-                                    title: "Chat",
-                                    background: Colors.green,
-                                    onPressed: () {
-                                      controller.startPrivateChat();
-                                    },
-                                  )
-                                ],
-                              )
+                              DetailButtonSpace(
+                                actions: controller.user.isCurrent
+                                    ? [
+                                        DetailIconButton(
+                                          icon: Icons.group,
+                                          backColor: Colors.red,
+                                          onTap: () {
+                                            Get.toNamed(GroupsScreen.routeName);
+                                          },
+                                        ),
+                                      ]
+                                    : [
+                                        DetailIconButton(
+                                          icon: Icons.message,
+                                          onTap: () {
+                                            controller.startPrivateChat();
+                                          },
+                                        ),
+                                      ],
+                              ),
                             ],
                           ),
                         ),

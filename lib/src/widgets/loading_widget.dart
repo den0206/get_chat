@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class OverlayLoadingWidget extends StatelessWidget {
   const OverlayLoadingWidget({
@@ -8,23 +9,23 @@ class OverlayLoadingWidget extends StatelessWidget {
   }) : super(key: key);
 
   final Widget child;
-  final bool isLoading;
+  final RxBool isLoading;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        child,
-        if (isLoading)
-          Container(
-            decoration: BoxDecoration(
-              color: Color.fromRGBO(0, 0, 0, 0.6),
-            ),
-            child: PlainLoadingWidget(),
-          )
-      ],
-    );
+    return Obx(() => Stack(
+          fit: StackFit.expand,
+          children: [
+            child,
+            if (isLoading.value)
+              Container(
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(0, 0, 0, 0.6),
+                ),
+                child: PlainLoadingWidget(),
+              )
+          ],
+        ));
   }
 }
 

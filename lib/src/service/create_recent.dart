@@ -92,24 +92,52 @@ class CreateRecentService {
     return group;
   }
 
-  void createGroupRecent(Group group) {
-    group.members.forEach(
-      (user) {
-        final ref = firebaseRef(FirebaseRef.recent).doc();
-        final id = ref.id;
+  Future<void> createGroupRecent(Group group,
+      [List<FBUser>? tempMembers]) async {
+    final member = tempMembers ?? group.members;
 
-        final Map<String, dynamic> data = {
-          RecentKey.id: id,
-          RecentKey.userId: user.uid,
-          RecentKey.chatRoomId: group.id,
-          RecentKey.groupId: group.id,
-          RecentKey.lastMessage: "",
-          RecentKey.counter: 0,
-          RecentKey.date: Timestamp.now(),
-        };
+    await Future.forEach(member, (FBUser user) async {
+      final ref = firebaseRef(FirebaseRef.recent).doc();
+      final id = ref.id;
 
-        ref.set(data);
-      },
-    );
+      final Map<String, dynamic> data = {
+        RecentKey.id: id,
+        RecentKey.userId: user.uid,
+        RecentKey.chatRoomId: group.id,
+        RecentKey.groupId: group.id,
+        RecentKey.lastMessage: "",
+        RecentKey.counter: 0,
+        RecentKey.date: Timestamp.now(),
+      };
+
+      await ref.set(data);
+    });
+  }
+
+  Future<void> checkExistGroupRecent(Group group) async {
+    final List<FBUser> tempMembers = group.members;
+    tempMembers.add(AuthController.to.current);
+
+    List<String> tempMemberIds = tempMembers.map((user) => user.uid).toList();
+
+    final q = await firebaseRef(FirebaseRef.recent)
+        .where(RecentKey.chatRoomId, isEqualTo: group.id)
+        .get();
+
+    if (q.docs.isNotEmpty) {
+      for (QueryDocumentSnapshot<Object?> recent in q.docs) {
+        final currentRecent = recent;
+
+        final String current = currentRecent[RecentKey.userId];
+        if (tempMemberIds.contains(current)) {
+          tempMembers.removeWhere((user) => user.uid == current);
+        }
+      }
+    }
+
+    print("RecCrate Recent Count is ${tempMembers.length}");
+    if (tempMembers.isNotEmpty) {
+      createGroupRecent(group, tempMembers);
+    }
   }
 }

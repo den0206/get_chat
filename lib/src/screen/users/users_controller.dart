@@ -3,6 +3,7 @@ import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:getx_chat/src/model/fb_user.dart';
 import 'package:get/get.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
+import 'package:getx_chat/src/screen/network_branch.dart/network_branch.dart';
 import 'package:getx_chat/src/screen/user_detail/user_detail_sceen.dart';
 import 'package:getx_chat/src/service/create_recent.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
@@ -67,14 +68,21 @@ class UsersController extends GetxController {
     if (selectedUsers.length <= 1) {
       print("Too small...");
       return;
-    } else if (selectedUsers.length > 5) {
+    } else if (selectedUsers.length >= 5) {
       print("Too many ....");
       return;
     }
 
+    if (!NetworkManager.to.chackNetwork()) {
+      return;
+    }
+
     final group = await cr.createGroupChat(selectedUsers);
-    cr.createGroupRecent(group);
+
+    await cr.createGroupRecent(group);
     selectedUsers.clear();
+
+    Get.back();
   }
 
   void onTap(FBUser user) {

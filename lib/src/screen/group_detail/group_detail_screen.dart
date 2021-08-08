@@ -3,6 +3,7 @@ import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:getx_chat/src/screen/group_detail/group_detail_controller.dart';
 import 'package:get/get.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
+import 'package:getx_chat/src/widgets/custom_dialog.dart';
 import 'package:getx_chat/src/widgets/detail_profile_space.dart';
 import 'package:getx_chat/src/widgets/loading_widget.dart';
 import 'package:getx_chat/src/widgets/overlap_avatars.dart';
@@ -99,9 +100,18 @@ class GroupDetailScreen extends GetView<GroupDetailController> {
                                         ),
                                         DetailIconButton(
                                           icon: Icons.delete,
-                                          onTap: () async {
-                                            await controller
-                                                .deleteGroupByOnwer();
+                                          onTap: () {
+                                            Get.dialog(
+                                              CustomDialog(
+                                                  title: "Delete",
+                                                  descripon:
+                                                      "delete this Group?",
+                                                  onSuceed: () async {
+                                                    await controller
+                                                        .deleteGroupByOnwer();
+                                                  },
+                                                  icon: Icons.delete),
+                                            );
                                           },
                                           backColor: Colors.red,
                                         ),
@@ -131,6 +141,7 @@ class GroupDetailScreen extends GetView<GroupDetailController> {
                     ),
                     child: OverlapAvatars(
                       users: controller.group.members,
+                      size: Get.mediaQuery.size.width * 0.2,
                     ),
                   ),
                 ],

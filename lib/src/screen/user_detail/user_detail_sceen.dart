@@ -116,14 +116,14 @@ class UserDetailScreen extends GetView<UserDetailController> {
                     child: Container(
                       alignment: Alignment.topCenter,
                       padding: EdgeInsets.only(
-                        top: responsive.height * 0.02,
+                        top: responsive.height * 0.04,
                       ),
                       child: Center(
                         child: Hero(
                           tag: controller.user.uid,
                           child: CircleAvatar(
                             backgroundColor: Colors.grey,
-                            radius: responsive.width * 0.25,
+                            radius: responsive.width * 0.2,
                             backgroundImage: controller.user.imageUrl.isEmpty
                                 ? Image.asset("assets/images/defaultDark.png")
                                     .image

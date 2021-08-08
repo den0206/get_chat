@@ -20,64 +20,92 @@ class RecentsScreen extends GetView<RecentsController> {
   Widget build(BuildContext context) {
     Get.put(RecentsController());
 
-    return Scaffold(
-      backgroundColor: Colors.green[600],
-      appBar: AppBar(
-        toolbarHeight: 70,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: Row(
-          children: [
-            InkWell(
-              child: CircleAvatar(
-                radius: 20,
-                backgroundImage: getUserImage(AuthController.to.current),
+    return CupertinoPageScaffold(
+      backgroundColor: Colors.green,
+      child: CustomScrollView(
+        physics: AlwaysScrollableScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            backgroundColor: Colors.transparent,
+            toolbarHeight: 70,
+            elevation: 0,
+            // leadingWidth: 50,
+            leading: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: InkWell(
+                child: CircleAvatar(
+                  backgroundColor: Colors.grey,
+                  // radius: 20,
+                  backgroundImage: getUserImage(AuthController.to.current),
+                ),
+                onTap: () {
+                  Get.to(
+                    UserDetailScreen(),
+                    fullscreenDialog: true,
+                    binding: UserDetailBinding(),
+                    arguments: AuthController.to.current,
+                    transition: Transition.cupertinoDialog,
+                  );
+                },
               ),
-              onTap: () {
-                Get.to(
-                  UserDetailScreen(),
-                  fullscreenDialog: true,
-                  binding: UserDetailBinding(),
-                  arguments: AuthController.to.current,
-                  transition: Transition.cupertinoDialog,
-                );
-              },
             ),
-            Spacer(),
-            Text('Recents'),
-            Spacer()
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.person_add,
-            ),
-            onPressed: () {
-              Get.toNamed(UsersScreen.routeName, arguments: false);
-            },
-          )
-        ],
-      ),
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30),
-              topRight: Radius.circular(30),
-            )),
-        child: Obx(
-          () => ListView.separated(
-            separatorBuilder: (context, index) => Divider(),
-            itemCount: controller.recents.length,
-            itemBuilder: (BuildContext context, int index) {
-              final recent = controller.recents[index];
-
-              return RecentCell(recent: recent);
+            title: Text("Recents"),
+            actions: [
+              IconButton(
+                icon: Icon(
+                  Icons.person_add,
+                ),
+                onPressed: () {
+                  Get.toNamed(UsersScreen.routeName, arguments: false);
+                },
+              )
+            ],
+          ),
+          CupertinoSliverRefreshControl(
+            onRefresh: () async {
+              await Future.delayed(const Duration(seconds: 1));
+              print("refresh");
             },
           ),
-        ),
+          SliverToBoxAdapter(
+            child: Container(
+              // color: Colors.green,
+              height: 20,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Container(
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: const Radius.circular(20.0),
+                        topRight: const Radius.circular(20.0),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Obx(
+            () => SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final recent = controller.recents[index];
+                  return RecentCell(recent: recent);
+                },
+                childCount: controller.recents.length,
+              ),
+            ),
+          ),
+          SliverFillRemaining(
+            child: Container(
+              color: Colors.white,
+            ),
+            hasScrollBody: false,
+          ),
+        ],
       ),
     );
   }
@@ -112,7 +140,8 @@ class RecentCell extends GetView<RecentsController> {
           await controller.pushMessage(recent);
         },
         child: Container(
-          margin: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+          color: Colors.white,
+          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
           child: Row(
             children: [
               recent.type == RecentType.private

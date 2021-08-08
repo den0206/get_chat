@@ -25,7 +25,7 @@ class DetailIconButton extends StatelessWidget {
     required this.icon,
     required this.onTap,
     this.backColor = Colors.green,
-    this.size = 80,
+    this.size = 60,
   }) : super(key: key);
 
   final IconData icon;

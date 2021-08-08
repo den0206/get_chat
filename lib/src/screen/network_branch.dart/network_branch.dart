@@ -100,7 +100,7 @@ class NoInternetBanner extends StatelessWidget {
     return FadeInOutWidget(
       visible: visible,
       child: Align(
-        alignment: Alignment.topCenter,
+        alignment: Alignment.bottomCenter,
         child: Container(
           height: 100,
           decoration: BoxDecoration(color: Colors.black),

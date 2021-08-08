@@ -6,16 +6,19 @@ class OverlapAvatars extends StatelessWidget {
   const OverlapAvatars({
     Key? key,
     required this.users,
+    this.size = 40,
   }) : super(key: key);
 
   final List<FBUser> users;
+
+  final double size;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Container(
-        height: 50,
+        height: size,
         child: ListView.builder(
           shrinkWrap: true,
           scrollDirection: Axis.horizontal,
@@ -23,10 +26,17 @@ class OverlapAvatars extends StatelessWidget {
           itemBuilder: (context, index) {
             return Align(
               widthFactor: 0.4,
-              child: CircleAvatar(
-                radius: 20,
-                backgroundColor: Colors.grey,
-                backgroundImage: getUserImage(users[index]),
+              child: Container(
+                height: size,
+                width: size,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey,
+                  image: DecorationImage(
+                    image: getUserImage(users[index]),
+                    // fit: BoxFit.cover,
+                  ),
+                ),
               ),
             );
           },

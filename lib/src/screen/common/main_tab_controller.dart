@@ -7,7 +7,11 @@ import 'package:getx_chat/src/screen/recent/recents_screen.dart';
 import 'package:getx_chat/src/screen/users/users_screen.dart';
 
 class MainTabController extends GetxController {
+  static MainTabController get to => Get.find();
   final auth = Get.find<AuthController>();
+
+  /// for fullscreen overlay
+  final RxBool isLoading = false.obs;
 
   var currentIndex = 0;
 
@@ -50,6 +54,11 @@ class MainTabController extends GetxController {
 
   void setIndex(int value) {
     currentIndex = value;
+    update();
+  }
+
+  void setLoading(bool value) {
+    isLoading.value = value;
     update();
   }
 }

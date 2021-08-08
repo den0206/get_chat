@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:getx_chat/src/model/fb_user.dart';
 import 'package:getx_chat/src/screen/users/users_controller.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
+import 'package:getx_chat/src/widgets/custom_dialog.dart';
 
 class UsersScreen extends StatelessWidget {
   const UsersScreen({
@@ -22,31 +23,30 @@ class UsersScreen extends StatelessWidget {
       builder: (controller) {
         return Scaffold(
           appBar: AppBar(
-            title: isPrivate
-                ? Text("Private")
-                : Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text("Group"),
-                      Badge(
-                          badgeColor: Colors.green,
-                          animationType: BadgeAnimationType.slide,
-                          showBadge: true,
-                          toAnimate: true,
-                          position: BadgePosition.topEnd(),
-                          badgeContent: Text(
-                            controller.selectedUsers.length.toString(),
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
-                          child: Icon(
-                            Icons.person_add,
-                            color: Colors.green,
-                            size: 28,
-                          ))
-                    ],
+            title: isPrivate ? Text("Private") : Text("Group"),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: Badge(
+                  badgeColor: Colors.green,
+                  animationType: BadgeAnimationType.slide,
+                  showBadge: true,
+                  toAnimate: true,
+                  position: BadgePosition.topEnd(),
+                  badgeContent: Text(
+                    controller.selectedUsers.length.toString(),
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
                   ),
+                  child: Icon(
+                    Icons.person_add,
+                    color: Colors.green,
+                    size: 28,
+                  ),
+                ),
+              )
+            ],
           ),
           body: ListView.separated(
             separatorBuilder: (context, index) => Divider(
@@ -65,7 +65,15 @@ class UsersScreen extends StatelessWidget {
                   child: Icon(Icons.add),
                   backgroundColor: Colors.green,
                   onPressed: () {
-                    controller.createGroup();
+                    Get.dialog(CustomDialog(
+                      title: "Group",
+                      descripon: "create group?",
+                      icon: Icons.group_add,
+                      mainColor: Colors.green,
+                      onSuceed: () {
+                        controller.createGroup();
+                      },
+                    ));
                   },
                 )
               : null,

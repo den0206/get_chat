@@ -31,12 +31,11 @@ class GroupDetailController extends GetxController {
   }
 
   Future<void> getToMessaggScreen() async {
+    final arguments = [group.id, group.members];
+    await Get.toNamed(MessageScreen.routeName, arguments: arguments);
     await cR.checkExistGroupRecent(group);
 
     Get.until((route) => route.isFirst);
-
-    final arguments = [group.id, group.members];
-    Get.toNamed(MessageScreen.routeName, arguments: arguments);
   }
 
   Future<void> deleteGroupByOnwer() async {

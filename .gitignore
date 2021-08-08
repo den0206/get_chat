@@ -50,5 +50,6 @@ app.*.map.json
 /android
 /assets
 /test
+/lib/src/utils/sec.dart
 
 

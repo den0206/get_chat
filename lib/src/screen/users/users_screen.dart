@@ -24,29 +24,31 @@ class UsersScreen extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(
             title: isPrivate ? Text("Private") : Text("Group"),
-            actions: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30),
-                child: Badge(
-                  badgeColor: Colors.green,
-                  animationType: BadgeAnimationType.slide,
-                  showBadge: true,
-                  toAnimate: true,
-                  position: BadgePosition.topEnd(),
-                  badgeContent: Text(
-                    controller.selectedUsers.length.toString(),
-                    style: TextStyle(
-                      color: Colors.white,
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.person_add,
-                    color: Colors.green,
-                    size: 28,
-                  ),
-                ),
-              )
-            ],
+            actions: !isPrivate
+                ? [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                      child: Badge(
+                        badgeColor: Colors.green,
+                        animationType: BadgeAnimationType.slide,
+                        showBadge: true,
+                        toAnimate: true,
+                        position: BadgePosition.topEnd(),
+                        badgeContent: Text(
+                          controller.selectedUsers.length.toString(),
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.person_add,
+                          color: Colors.green,
+                          size: 28,
+                        ),
+                      ),
+                    )
+                  ]
+                : null,
           ),
           body: ListView.separated(
             separatorBuilder: (context, index) => Divider(

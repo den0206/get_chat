@@ -54,9 +54,13 @@ class GroupCell extends StatelessWidget {
             SizedBox(
               width: 20,
             ),
-            Text(
-              group.title != null ? group.title! : group.id,
-              overflow: TextOverflow.ellipsis,
+            Flexible(
+              child: Text(
+                group.title != null ? group.title! : group.id,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                // softWrap: true,
+              ),
             ),
           ],
         ),

@@ -94,6 +94,9 @@ class RecentExtensionSearvice {
       (data) {
         final List<DocumentChange> documentChange = data.docChanges;
         documentChange.forEach((recentChange) {
+          if (recentChange.type == DocumentChangeType.removed) {
+            return;
+          }
           final tempRecent = Recent.fromDocument(recentChange.doc);
           onChage(tempRecent);
         });
@@ -103,28 +106,3 @@ class RecentExtensionSearvice {
     return _subscription;
   }
 }
-
-
-  // Stream<List<Recent>> toRelation() async* {
-  //   var q = firebaseRef(FirebaseRef.recent)
-  //       .where(RecentKey.userId, isEqualTo: searvice.currentUser)
-  //       .snapshots();
-
-  //   await for (var recentSnapshot in q) {
-  //     for (var doc in recentSnapshot.docChanges) {
-  //       Recent recent;
-  //       if (doc.doc[RecentKey.withUserId] != null) {
-  //         var userSnapshot = await firebaseRef(FirebaseRef.user)
-  //             .doc(doc.doc[RecentKey.withUserId])
-  //             .get();
-  //         recent = Recent.fromDocument(doc.doc);
-  //         recent.withUser = FBUser.fromMap(userSnapshot);
-  //       } else {
-  //         recent = Recent.fromDocument(doc.doc);
-  //       }
-  //       recents.add(recent);
-  //     }
-  //   }
-
-  //   yield recents;
-  // }

@@ -125,14 +125,21 @@ class CreateRecentService {
         .get();
 
     if (q.docs.isNotEmpty) {
-      for (QueryDocumentSnapshot<Object?> recent in q.docs) {
+      await Future.forEach(q.docs, (QueryDocumentSnapshot<Object?> recent) {
         final currentRecent = recent;
-
         final String current = currentRecent[RecentKey.userId];
         if (tempMemberIds.contains(current)) {
           tempMembers.removeWhere((user) => user.uid == current);
         }
-      }
+      });
+      // for (QueryDocumentSnapshot<Object?> recent in q.docs) {
+      //   final currentRecent = recent;
+
+      //   final String current = currentRecent[RecentKey.userId];
+      //   if (tempMemberIds.contains(current)) {
+      //     tempMembers.removeWhere((user) => user.uid == current);
+      //   }
+      // }
     }
 
     print("RecCrate Recent Count is ${tempMembers.length}");

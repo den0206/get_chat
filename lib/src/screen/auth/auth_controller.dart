@@ -43,12 +43,17 @@ class AuthController extends GetxService {
   }
 
   Future<void> logout() async {
+    if (!current.isCurrent) {
+      return;
+    }
+
     try {
       user.value = null;
       currentUser = null;
       await Get.delete<RecentsController>();
       print(currentUser);
       await auth.signOut();
+      Get.back();
     } catch (e) {
       print(e.toString());
     }

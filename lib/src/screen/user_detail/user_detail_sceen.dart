@@ -4,6 +4,8 @@ import 'package:getx_chat/src/screen/groups/groups_screen.dart';
 
 import 'package:getx_chat/src/screen/network_branch.dart/network_branch.dart';
 import 'package:getx_chat/src/screen/user_detail/user_detail_controller.dart';
+import 'package:getx_chat/src/utils/firebaseRef.dart';
+import 'package:getx_chat/src/widgets/custom_dialog.dart';
 import 'package:getx_chat/src/widgets/detail_profile_space.dart';
 
 class UserDetailScreen extends GetView<UserDetailController> {
@@ -23,7 +25,7 @@ class UserDetailScreen extends GetView<UserDetailController> {
       ),
       body: BaseScreen(
         child: SingleChildScrollView(
-          physics: NeverScrollableScrollPhysics(),
+          physics: ScrollPhysics(),
           child: Column(
             children: [
               Stack(
@@ -42,102 +44,107 @@ class UserDetailScreen extends GetView<UserDetailController> {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Container(
-                      padding: EdgeInsets.only(top: responsive.width * 0.3),
-                      child: Card(
-                        elevation: 5,
-                        color: Colors.transparent,
-                        child: Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.only(
-                            top: responsive.height * 0.13,
-                            bottom: responsive.height * 0.03,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(20),
+                  Column(
+                    children: [
+                      SizedBox(
+                        height: kToolbarHeight + 20,
+                      ),
+                      Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.topCenter,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.fromLTRB(10, 70, 10, 10),
+                            padding: EdgeInsets.only(
+                              top: responsive.height * 0.05,
+                              bottom: responsive.height * 0.03,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: Column(
+                              children: [
+                                Text(
+                                  controller.user.name,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 40.0,
+                                      color: Colors.black),
+                                ),
+                                SizedBox(
+                                  height: responsive.height * 0.02,
+                                ),
+                                Text(
+                                  controller.user.email,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: responsive.height * 0.03,
+                                ),
+                                DetailButtonSpace(
+                                  actions: controller.user.isCurrent
+                                      ? [
+                                          DetailIconButton(
+                                            icon: Icons.group,
+                                            backColor: Colors.orange,
+                                            onTap: () {
+                                              Get.toNamed(
+                                                  GroupsScreen.routeName);
+                                            },
+                                          ),
+                                          DetailIconButton(
+                                            backColor: Colors.red,
+                                            icon: Icons.logout,
+                                            onTap: () {
+                                              Get.dialog(CustomDialog(
+                                                title: "Logout",
+                                                descripon: "logOut",
+                                                icon: Icons.logout,
+                                                onSuceed: () {
+                                                  controller.auth.logout();
+                                                },
+                                              ));
+                                            },
+                                          ),
+                                        ]
+                                      : [
+                                          DetailIconButton(
+                                            icon: Icons.message,
+                                            onTap: () {
+                                              controller.startPrivateChat();
+                                            },
+                                          ),
+                                        ],
+                                ),
+                              ],
                             ),
                           ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Text(
-                                controller.user.name,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 40.0,
-                                    color: Colors.black),
-                              ),
-                              SizedBox(
-                                height: responsive.height * 0.02,
-                              ),
-                              Text(
-                                controller.user.email,
-                                style: TextStyle(
-                                  color: Colors.black,
-                                ),
-                              ),
-                              SizedBox(
-                                height: responsive.height * 0.03,
-                              ),
-                              DetailButtonSpace(
-                                actions: controller.user.isCurrent
-                                    ? [
-                                        DetailIconButton(
-                                          icon: Icons.group,
-                                          backColor: Colors.red,
-                                          onTap: () {
-                                            Get.toNamed(GroupsScreen.routeName);
-                                          },
-                                        ),
-                                      ]
-                                    : [
-                                        DetailIconButton(
-                                          icon: Icons.message,
-                                          onTap: () {
-                                            controller.startPrivateChat();
-                                          },
-                                        ),
-                                      ],
-                              ),
-                            ],
+                          Positioned(
+                            top: -60,
+                            child: CircleAvatar(
+                              backgroundColor: Colors.grey,
+                              radius: responsive.width * 0.2,
+                              backgroundImage: getUserImage(controller.user),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ),
-                  ),
-                  Card(
-                    elevation: 10,
-                    shape: CircleBorder(),
-                    color: Colors.transparent,
-                    child: Container(
-                      alignment: Alignment.topCenter,
-                      padding: EdgeInsets.only(
-                        top: responsive.height * 0.04,
-                      ),
-                      child: Center(
-                        child: Hero(
-                          tag: controller.user.uid,
-                          child: CircleAvatar(
-                            backgroundColor: Colors.grey,
-                            radius: responsive.width * 0.2,
-                            backgroundImage: controller.user.imageUrl.isEmpty
-                                ? Image.asset("assets/images/defaultDark.png")
-                                    .image
-                                : NetworkImage(
-                                    controller.user.imageUrl,
-                                  ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    ],
                   ),
                 ],
               ),
               Divider(),
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: 1,
+                physics: NeverScrollableScrollPhysics(),
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(title: Text("$index"));
+                },
+              ),
             ],
           ),
         ),

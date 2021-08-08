@@ -119,8 +119,7 @@ class RecentsController extends GetxController {
   }
 
   Future<void> deleteRecent(Recent recent) async {
-    await firebaseRef(FirebaseRef.recent).doc(recent.id).delete();
-
     recents.remove(recent);
+    await firebaseRef(FirebaseRef.recent).doc(recent.id).delete();
   }
 }

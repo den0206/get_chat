@@ -121,141 +121,154 @@ class RecentCell extends GetView<RecentsController> {
 
   @override
   Widget build(BuildContext context) {
-    return Slidable(
-      key: Key(recent.id),
-      actionPane: SlidableDrawerActionPane(),
-      actionExtentRatio: 0.25,
-      secondaryActions: [
-        IconSlideAction(
-          caption: 'delete',
-          color: Colors.red,
-          icon: Icons.delete,
-          onTap: () {
-            controller.deleteRecent(recent);
-          },
-        ),
-      ],
-      child: InkWell(
-        onTap: () async {
-          await controller.pushMessage(recent);
-        },
-        child: Container(
-          color: Colors.white,
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-          child: Row(
+    return InkWell(
+      onTap: () async {
+        await controller.pushMessage(recent);
+      },
+      child: Container(
+        color: Colors.white,
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+        child: Slidable(
+          key: Key(recent.id),
+          actionPane: SlidableDrawerActionPane(),
+          actionExtentRatio: 0.25,
+          secondaryActions: [
+            IconSlideAction(
+              caption: 'delete',
+              color: Colors.red,
+              icon: Icons.delete,
+              onTap: () {
+                controller.deleteRecent(recent);
+              },
+            ),
+          ],
+          child: Column(
             children: [
-              recent.type == RecentType.private
-                  ? Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 3,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.grey.withOpacity(.3),
-                              offset: Offset(0, 5),
-                              blurRadius: 25)
-                        ],
-                      ),
-                      child: Stack(
-                        children: [
-                          Positioned.fill(
-                            child: CircleAvatar(
-                              backgroundColor: Colors.grey,
-                              backgroundImage: getUserImage(recent.withUser!),
+              Row(
+                children: [
+                  recent.type == RecentType.private
+                      ? Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 3,
                             ),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.grey.withOpacity(.3),
+                                  offset: Offset(0, 5),
+                                  blurRadius: 25)
+                            ],
                           ),
-                          recent.counter != 0
-                              ? Align(
-                                  alignment: Alignment.topRight,
-                                  child: Container(
-                                    height: 15,
-                                    width: 15,
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.white,
-                                        width: 3,
+                          child: Stack(
+                            children: [
+                              Positioned.fill(
+                                child: CircleAvatar(
+                                  backgroundColor: Colors.grey,
+                                  backgroundImage:
+                                      getUserImage(recent.withUser!),
+                                ),
+                              ),
+                              recent.counter != 0
+                                  ? Align(
+                                      alignment: Alignment.topRight,
+                                      child: Container(
+                                        height: 15,
+                                        width: 15,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 3,
+                                          ),
+                                          shape: BoxShape.circle,
+                                          color: Colors.green,
+                                        ),
                                       ),
-                                      shape: BoxShape.circle,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                )
-                              : Container(),
-                        ],
-                      ),
-                    )
-                  : OverlapAvatars(users: recent.group!.members),
-              SizedBox(
-                width: 20,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    recent.type == RecentType.private
-                        ? recent.withUser!.name
-                        : recent.group?.title ?? "Group",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color(0xff686795),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
+                                    )
+                                  : Container(),
+                            ],
+                          ),
+                        )
+                      : OverlapAvatars(users: recent.group!.members),
                   SizedBox(
-                    height: 5,
+                    width: 20,
                   ),
-                  Container(
-                    constraints: BoxConstraints(minWidth: 100, maxWidth: 200),
-                    child: Text(
-                      recent.lastMessage,
-                      maxLines: 2,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 14,
-                        letterSpacing: 1.2,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  )
-                ],
-              ),
-              Spacer(),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  if (recent.counter != 0)
-                    CircleAvatar(
-                      radius: 15,
-                      backgroundColor: Color(0xffEE1D1D),
-                      child: Text(
-                        recent.counter.toString(),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        recent.type == RecentType.private
+                            ? recent.withUser!.name
+                            : recent.group?.title ?? "Group",
+                        textAlign: TextAlign.center,
                         style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold),
+                          color: Color(0xff686795),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.5,
+                        ),
                       ),
-                    ),
-                  SizedBox(
-                    height: 10,
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Container(
+                        constraints:
+                            BoxConstraints(minWidth: 100, maxWidth: 200),
+                        child: Text(
+                          recent.lastMessage,
+                          maxLines: 2,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            letterSpacing: 1.2,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      )
+                    ],
                   ),
-                  Text(
-                    recent.formattedTime,
-                    style: TextStyle(
-                      color: Color(0xffAEABC9),
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1,
-                    ),
+                  Spacer(),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      if (recent.counter != 0)
+                        CircleAvatar(
+                          radius: 15,
+                          backgroundColor: Color(0xffEE1D1D),
+                          child: Text(
+                            recent.counter.toString(),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        recent.formattedTime,
+                        style: TextStyle(
+                          color: Color(0xffAEABC9),
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Divider(
+                color: Colors.grey,
+                height: 1,
               ),
             ],
           ),

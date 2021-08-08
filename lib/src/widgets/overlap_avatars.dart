@@ -33,6 +33,7 @@ class OverlapAvatars extends StatelessWidget {
                   shape: BoxShape.circle,
                   color: Colors.grey,
                   image: DecorationImage(
+                    fit: BoxFit.cover,
                     image: getUserImage(users[index]),
                     // fit: BoxFit.cover,
                   ),

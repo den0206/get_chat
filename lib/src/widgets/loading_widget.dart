@@ -29,6 +29,20 @@ class OverlayLoadingWidget extends StatelessWidget {
   }
 }
 
+class LoadingCellWidget extends StatelessWidget {
+  const LoadingCellWidget({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Center(child: Text("Loading...")),
+    );
+  }
+}
+
 class PlainLoadingWidget extends StatelessWidget {
   const PlainLoadingWidget({Key? key}) : super(key: key);
 

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:get/get.dart';
 import 'package:getx_chat/src/model/fb_user.dart';
+import 'package:getx_chat/src/screen/news/news_controller.dart';
 import 'package:getx_chat/src/screen/recent/recents_controller.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
 
@@ -51,6 +52,7 @@ class AuthController extends GetxService {
       user.value = null;
       currentUser = null;
       await Get.delete<RecentsController>();
+      await Get.delete<NewsController>();
       print(currentUser);
       await auth.signOut();
       Get.back();

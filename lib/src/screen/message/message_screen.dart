@@ -9,6 +9,7 @@ import 'package:getx_chat/src/model/message.dart';
 import 'package:getx_chat/src/screen/message/message_Controller.dart';
 import 'package:getx_chat/src/screen/network_branch.dart/network_branch.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
+import 'package:getx_chat/src/widgets/loading_widget.dart';
 import 'message_bubble/image_bubble.dart';
 import 'message_bubble/text_bubble.dart';
 import 'message_bubble/video_bubble.dart';
@@ -51,11 +52,7 @@ class MessageScreen extends GetView<MessageController> {
                           if (index == controller.messages.length - 1) {
                             controller.loadMessage();
                             if (controller.isloading)
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 10),
-                                child: Center(child: Text("Loading...")),
-                              );
+                              return LoadingCellWidget();
                           }
                           return MessageCell(message: message);
                         },

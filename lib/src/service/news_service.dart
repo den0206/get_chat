@@ -18,6 +18,7 @@ class NewsService {
     final queryParameters = {
       "page": "$currentPage",
       "per_page": "$perPage",
+      "sort": "created"
     };
 
     final uri = Uri.https(

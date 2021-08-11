@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:getx_chat/src/screen/auth/login/login_screen.dart';
 import 'package:getx_chat/src/screen/auth/signup/signup_controller.dart';
 import 'package:getx_chat/src/screen/auth/signup/signup_screen.dart';
+import 'package:getx_chat/src/screen/edit_user/edit_user_controller.dart';
+import 'package:getx_chat/src/screen/edit_user/edit_user_screen.dart';
 import 'package:getx_chat/src/screen/group_detail/group_detail_controller.dart';
 import 'package:getx_chat/src/screen/group_detail/group_detail_screen.dart';
 import 'package:getx_chat/src/screen/groups/groups_controller.dart';
@@ -14,8 +16,7 @@ import 'package:getx_chat/src/screen/home/home_screen.dart';
 import 'package:getx_chat/src/screen/message/message_Controller.dart';
 import 'package:getx_chat/src/screen/message/message_screen.dart';
 import 'package:getx_chat/src/screen/root.dart';
-import 'package:getx_chat/src/screen/user_detail/user_detail_controller.dart';
-import 'package:getx_chat/src/screen/user_detail/user_detail_sceen.dart';
+
 import 'package:getx_chat/src/screen/users/users_screen.dart';
 
 Future<void> main() async {
@@ -64,11 +65,6 @@ class MyApp extends StatelessWidget {
           page: () => HomeScreen(),
         ),
         GetPage(
-          name: UserDetailScreen.routeName,
-          page: () => UserDetailScreen(),
-          binding: UserDetailBinding(),
-        ),
-        GetPage(
           name: MessageScreen.routeName,
           page: () => MessageScreen(),
           binding: MessageBinding(),
@@ -84,6 +80,11 @@ class MyApp extends StatelessWidget {
           name: GroupsScreen.routeName,
           page: () => GroupsScreen(),
           binding: GroupsBinding(),
+        ),
+        GetPage(
+          name: EditUserScreen.routeName,
+          page: () => EditUserScreen(),
+          binding: EditUserBinding(),
         ),
         GetPage(
           name: GroupDetailScreen.routeName,

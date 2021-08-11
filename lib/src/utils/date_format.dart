@@ -28,4 +28,16 @@ class DateFormatter {
     }
     return '${DateFormat('yMd').format(dateTime)}, $roughTimeString';
   }
+
+  bool isNewUntilYesterday(DateTime dateTime) {
+    DateTime now = DateTime.now();
+    DateTime localDateTime = dateTime.toLocal();
+
+    DateTime yesterday = now.subtract(Duration(days: 1));
+    if (!localDateTime.difference(yesterday).isNegative) {
+      return true;
+    }
+
+    return false;
+  }
 }

@@ -5,20 +5,19 @@ import 'package:getx_chat/src/screen/auth/auth_controller.dart';
 import 'package:getx_chat/src/screen/message/message_screen.dart';
 import 'package:getx_chat/src/service/create_recent.dart';
 
-class UserDetailBinding implements Bindings {
-  @override
-  void dependencies() {
-    Get.put(UserDetailController());
-  }
-}
+// class UserDetailBinding implements Bindings {
+//   @override
+//   void dependencies() {
+//     Get.put(UserDetailController());
+//   }
+// }
 
 class UserDetailController extends GetxController {
-  final FBUser user = Get.arguments;
+  final FBUser user;
   final AuthController auth = Get.find();
 
   final CreateRecentService cR = CreateRecentService();
-
-  bool get isCurrent => user.uid == auth.currentUser?.uid;
+  UserDetailController({required this.user});
 
   @override
   void onInit() {
@@ -26,7 +25,7 @@ class UserDetailController extends GetxController {
   }
 
   Future<void> startPrivateChat() async {
-    if (isCurrent) {
+    if (user.isCurrent) {
       return;
     }
 

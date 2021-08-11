@@ -87,7 +87,7 @@ class UsersController extends GetxController {
 
   void onTap(FBUser user) {
     if (isPrivate) {
-      Get.toNamed(UserDetailScreen.routeName, arguments: user);
+      Get.to(UserDetailScreen(user: user));
     } else {
       if (!selectedUsers.contains(user)) {
         selectedUsers.add(user);

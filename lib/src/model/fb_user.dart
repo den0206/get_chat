@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
 
 class FBUser {
@@ -37,6 +38,20 @@ class FBUser {
       UserKey.email: email,
       UserKey.imageUrl: imageUrl,
     };
+  }
+
+  FBUser copyWith({
+    String? uid,
+    String? name,
+    String? email,
+    String? imageUrl,
+  }) {
+    return FBUser(
+      uid: uid ?? this.uid,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      imageUrl: imageUrl ?? this.imageUrl,
+    );
   }
 }
 

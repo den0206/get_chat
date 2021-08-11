@@ -7,7 +7,6 @@ import 'package:getx_chat/src/model/recent.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
 import 'package:getx_chat/src/screen/recent/recents_controller.dart';
 import 'package:get/get.dart';
-import 'package:getx_chat/src/screen/user_detail/user_detail_controller.dart';
 import 'package:getx_chat/src/screen/user_detail/user_detail_sceen.dart';
 import 'package:getx_chat/src/screen/users/users_screen.dart';
 import 'package:getx_chat/src/utils/firebaseRef.dart';
@@ -40,10 +39,10 @@ class RecentsScreen extends GetView<RecentsController> {
                 ),
                 onTap: () {
                   Get.to(
-                    UserDetailScreen(),
+                    UserDetailScreen(
+                      user: AuthController.to.current,
+                    ),
                     fullscreenDialog: true,
-                    binding: UserDetailBinding(),
-                    arguments: AuthController.to.current,
                     transition: Transition.cupertinoDialog,
                   );
                 },

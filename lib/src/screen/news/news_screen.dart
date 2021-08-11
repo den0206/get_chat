@@ -53,12 +53,17 @@ class NewsScreen extends GetView<NewsController> {
                     onPressed: () async {
                       await controller.selectTopic(index);
                     },
-                    child: ClipOval(
-                      child: Image.asset(
-                        topic.imagePath,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
+                    child: topic != Topic.flutter
+                        ? ClipOval(
+                            clipBehavior: Clip.antiAlias,
+                            child: Image.asset(
+                              topic.imagePath,
+                              fit: BoxFit.contain,
+                            ),
+                          )
+                        : FlutterLogo(
+                            size: 40,
+                          ),
                   );
                 },
               ),
@@ -132,54 +137,67 @@ class ArticleCell extends GetView<NewsController> {
         onTap: () {
           controller.launchUrl(article);
         },
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(
-            color: Colors.green.shade400,
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: Colors.white),
-          ),
-          child: Stack(
-            children: [
-              Center(
-                child: Text(
-                  article.title,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 3,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  bottom: 12,
-                  right: 4,
-                  left: 4,
-                ),
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Row(
-                    children: [
-                      /// likes Count
-                      Spacer(),
-                      ClipOval(
-                        child: Image.network(
-                          article.user.iconUrl,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Icon(Icons.error),
-                          width: 30,
-                          height: 30,
-                        ),
-                      ),
-                    ],
-                  ),
+        child: article.isNew
+            ? ClipRect(
+                child: Banner(
+                  message: "New",
+                  location: BannerLocation.topStart,
+                  color: Colors.red,
+                  child: _artcleCell(),
                 ),
               )
-            ],
+            : _artcleCell(),
+      ),
+    );
+  }
+
+  Container _artcleCell() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        color: Colors.green.shade400,
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: Colors.white),
+      ),
+      child: Stack(
+        children: [
+          Center(
+            child: Text(
+              article.title,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 3,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+              ),
+            ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.only(
+              bottom: 12,
+              right: 4,
+              left: 4,
+            ),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Row(
+                children: [
+                  /// likes count
+                  Spacer(),
+                  ClipOval(
+                    child: Image.network(
+                      article.user.iconUrl,
+                      errorBuilder: (context, error, stackTrace) =>
+                          Icon(Icons.error),
+                      width: 30,
+                      height: 30,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

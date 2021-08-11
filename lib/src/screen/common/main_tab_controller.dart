@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:get/get.dart';
 import 'package:getx_chat/src/screen/auth/auth_controller.dart';
-import 'package:getx_chat/src/screen/home/home_screen.dart';
 import 'package:getx_chat/src/screen/news/news_screen.dart';
 import 'package:getx_chat/src/screen/recent/recents_screen.dart';
+import 'package:getx_chat/src/screen/user_detail/user_detail_sceen.dart';
 import 'package:getx_chat/src/screen/users/users_screen.dart';
 
 class MainTabController extends GetxController {
@@ -26,13 +26,13 @@ class MainTabController extends GetxController {
       icon: Icon(Icons.pages),
     ),
     BottomNavigationBarItem(
-      label: "Home",
+      label: "Users",
       icon: Icon(
-        Icons.home,
+        Icons.group,
       ),
     ),
     BottomNavigationBarItem(
-      label: "Users",
+      label: "Profile",
       icon: Icon(
         Icons.person,
       ),
@@ -42,10 +42,8 @@ class MainTabController extends GetxController {
   final List<Widget> pages = [
     RecentsScreen(),
     NewsScreen(),
-    HomeScreen(),
-    UsersScreen(
-      isPrivate: true,
-    ),
+    UsersScreen(isPrivate: true),
+    UserDetailScreen(user: AuthController.to.current)
   ];
 
   @override

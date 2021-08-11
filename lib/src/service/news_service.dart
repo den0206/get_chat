@@ -7,7 +7,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class NewsService {
-  // int currentPage = 1;
   final perPage = 20;
 
   Future<List<Article>> fetchNews({
@@ -38,7 +37,6 @@ class NewsService {
 
     final List<dynamic> jsonData = json.decode(response.body);
     articles.addAll(jsonData.map((json) => Article.fromJson(json)).toList());
-    // currentPage++;
 
     return articles;
   }

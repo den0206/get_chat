@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -38,7 +39,11 @@ class LoadingCellWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Center(child: Text("Loading...")),
+      child: Center(
+        child: CupertinoActivityIndicator(
+          radius: 12.0,
+        ),
+      ),
     );
   }
 }

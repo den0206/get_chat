@@ -1,4 +1,4 @@
-enum Topic { dart, flutter }
+enum Topic { dart, flutter, c, go, java, javascript, php, ruby, swift }
 
 extension TopicTypEXT on Topic {
   String get path {
@@ -7,6 +7,20 @@ extension TopicTypEXT on Topic {
         return "dart";
       case Topic.flutter:
         return "flutter";
+      case Topic.c:
+        return "c";
+      case Topic.go:
+        return "go";
+      case Topic.java:
+        return "java";
+      case Topic.javascript:
+        return "javascript";
+      case Topic.php:
+        return "php";
+      case Topic.ruby:
+        return "ruby";
+      case Topic.swift:
+        return "swift";
     }
   }
 

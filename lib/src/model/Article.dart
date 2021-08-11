@@ -1,14 +1,25 @@
 class Article {
+  final String id;
   final String title;
   final String url;
   final QUser user;
 
-  Article({required this.title, required this.url, required this.user});
+  final int likesCount;
+
+  Article({
+    required this.id,
+    required this.title,
+    required this.url,
+    required this.user,
+    required this.likesCount,
+  });
 
   factory Article.fromJson(Map<String, dynamic> json) {
     return Article(
+      id: json['id'],
       title: json['title'],
       url: json['url'],
+      likesCount: json["likes_count"],
       user: QUser.fromJson(json['user']),
     );
   }

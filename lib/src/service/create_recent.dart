@@ -132,14 +132,6 @@ class CreateRecentService {
           tempMembers.removeWhere((user) => user.uid == current);
         }
       });
-      // for (QueryDocumentSnapshot<Object?> recent in q.docs) {
-      //   final currentRecent = recent;
-
-      //   final String current = currentRecent[RecentKey.userId];
-      //   if (tempMemberIds.contains(current)) {
-      //     tempMembers.removeWhere((user) => user.uid == current);
-      //   }
-      // }
     }
 
     print("RecCrate Recent Count is ${tempMembers.length}");

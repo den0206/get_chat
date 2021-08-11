@@ -1,8 +1,11 @@
+import 'dart:ui';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import 'package:getx_chat/src/model/article.dart';
 import 'package:getx_chat/src/model/topic.dart';
-
 import 'package:getx_chat/src/screen/news/news_controller.dart';
 import 'package:getx_chat/src/widgets/loading_widget.dart';
 
@@ -16,7 +19,7 @@ class NewsScreen extends GetView<NewsController> {
     return Scaffold(
       backgroundColor: Colors.green,
       appBar: AppBar(
-        title: Text('News'),
+        title: Obx(() => Text(controller.currentTopic.title)),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -45,15 +48,16 @@ class NewsScreen extends GetView<NewsController> {
                     style: ElevatedButton.styleFrom(
                       primary: Colors.transparent,
                       elevation: 0,
+                      shape: CircleBorder(),
                     ),
-                    clipBehavior: Clip.hardEdge,
                     onPressed: () async {
                       await controller.selectTopic(index);
                     },
-                    child: CircleAvatar(
-                      backgroundColor: Colors.transparent,
-                      backgroundImage: AssetImage(topic.imagePath),
-                      radius: 30,
+                    child: ClipOval(
+                      child: Image.asset(
+                        topic.imagePath,
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   );
                 },
@@ -66,27 +70,43 @@ class NewsScreen extends GetView<NewsController> {
                 height: 1,
               ),
             ),
-            Obx(
-              () => Flexible(
-                child: GridView.builder(
-                  itemCount: controller.topicList.length,
-                  controller: controller.sC,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    childAspectRatio: 1,
+            Flexible(
+              child: CustomScrollView(
+                controller: controller.sC,
+                slivers: [
+                  CupertinoSliverRefreshControl(
+                    onRefresh: () async {
+                      await Future.delayed(const Duration(seconds: 1));
+                      print("refresh");
+                      await controller.refresh();
+                    },
                   ),
-                  itemBuilder: (context, index) {
-                    final article = controller.topicList[index];
+                  Obx(
+                    () => SliverGrid(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 1,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final article = controller.topicList[index];
 
-                    if (index == controller.topicList.length - 1) {
-                      controller.fetchTopic();
-                      if (controller.isLoading) return LoadingCellWidget();
-                    }
-                    return ArticleCell(article: article);
-                  },
-                ),
+                          if (index == controller.topicList.length - 1) {
+                            controller.fetchTopic();
+                            if (controller.isLoading)
+                              return LoadingCellWidget();
+                          }
+                          return ArticleCell(
+                            article: article,
+                          );
+                        },
+                        childCount: controller.topicList.length,
+                      ),
+                    ),
+                  )
+                ],
               ),
             ),
           ],
@@ -96,7 +116,7 @@ class NewsScreen extends GetView<NewsController> {
   }
 }
 
-class ArticleCell extends StatelessWidget {
+class ArticleCell extends GetView<NewsController> {
   const ArticleCell({
     Key? key,
     required this.article,
@@ -109,21 +129,76 @@ class ArticleCell extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: InkResponse(
+        onTap: () {
+          controller.launchUrl(article);
+        },
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Colors.green.shade400,
             borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: Colors.black),
+            border: Border.all(color: Colors.white),
           ),
-          child: Center(
-            child: Text(
-              article.title,
-              style: TextStyle(fontSize: 12),
-            ),
+          child: Stack(
+            children: [
+              Center(
+                child: Text(
+                  article.title,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 3,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(
+                  bottom: 12,
+                  right: 4,
+                  left: 4,
+                ),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Row(
+                    children: [
+                      /// likes Count
+                      Spacer(),
+                      ClipOval(
+                        child: Image.network(
+                          article.user.iconUrl,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Icon(Icons.error),
+                          width: 30,
+                          height: 30,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            ],
           ),
         ),
       ),
     );
   }
 }
+
+ /// likes Count
+// Column(
+  //   mainAxisSize: MainAxisSize.min,
+  //   children: [
+  //     Text(
+  //       article.likesCount.toString(),
+  //       style: TextStyle(
+  //         color: Colors.white,
+  //       ),
+  //     ),
+  //     Icon(
+  //       Icons.favorite,
+  //       color: Colors.red,
+  //       size: 30,
+  //     ),
+  //   ],
+  // ),

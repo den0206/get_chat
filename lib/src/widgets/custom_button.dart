@@ -18,7 +18,7 @@ class CustomButton extends StatelessWidget {
   final double width;
   final double height;
   final bool isLoading;
-  final Function()? onPressed;
+  final void Function()? onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -66,18 +66,19 @@ class CircleImageButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-        elevation: 4,
-        shape: CircleBorder(),
-        clipBehavior: Clip.hardEdge,
-        color: Colors.transparent,
-        child: Ink.image(
-          image: imageProvider,
-          fit: BoxFit.fill,
-          width: 120.0,
-          height: 120.0,
-          child: InkWell(
-            onTap: onTap,
-          ),
-        ));
+      elevation: 4,
+      shape: CircleBorder(),
+      clipBehavior: Clip.hardEdge,
+      color: Colors.transparent,
+      child: Ink.image(
+        image: imageProvider,
+        fit: BoxFit.cover,
+        width: 120.0,
+        height: 120.0,
+        child: InkWell(
+          onTap: onTap,
+        ),
+      ),
+    );
   }
 }

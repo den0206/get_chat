@@ -19,6 +19,10 @@ class FBUser {
     required this.imageUrl,
   });
 
+  String get avatarPath {
+    return "$uid";
+  }
+
   factory FBUser.fromMap(DocumentSnapshot doc) {
     return FBUser(
       name: doc[UserKey.name],

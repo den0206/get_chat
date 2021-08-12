@@ -54,12 +54,9 @@ class NewsScreen extends GetView<NewsController> {
                       await controller.selectTopic(index);
                     },
                     child: topic != Topic.flutter
-                        ? ClipOval(
-                            clipBehavior: Clip.antiAlias,
-                            child: Image.asset(
-                              topic.imagePath,
-                              fit: BoxFit.contain,
-                            ),
+                        ? CircleAvatar(
+                            backgroundImage: AssetImage(topic.imagePath),
+                            backgroundColor: Colors.transparent,
                           )
                         : FlutterLogo(
                             size: 40,
@@ -82,7 +79,6 @@ class NewsScreen extends GetView<NewsController> {
                   CupertinoSliverRefreshControl(
                     onRefresh: () async {
                       await Future.delayed(const Duration(seconds: 1));
-                      print("refresh");
                       await controller.refresh();
                     },
                   ),

@@ -13,7 +13,7 @@ import 'package:getx_chat/src/service/create_recent.dart';
 // }
 
 class UserDetailController extends GetxController {
-  final FBUser user;
+  final Rx<FBUser> user;
   final AuthController auth = Get.find();
 
   final CreateRecentService cR = CreateRecentService();
@@ -24,22 +24,27 @@ class UserDetailController extends GetxController {
     super.onInit();
   }
 
+  void updateEditedUser(FBUser editedUser) {
+    user.value = editedUser;
+    update();
+  }
+
   Future<void> startPrivateChat() async {
-    if (user.isCurrent) {
+    if (user.value.isCurrent) {
       return;
     }
 
     final chatRoomId = await cR.createChatRoom(AuthController.to.current.uid,
-        user.uid, [AuthController.to.current, user]);
+        user.value.uid, [AuthController.to.current, user.value]);
 
     /// present message screen
-    // Get.back();
+
     Get.until((route) => route.isFirst);
     // Get.find<MainTabController>().setIndex(0);
 
     final arguments = [
       chatRoomId,
-      [user],
+      [user.value],
     ];
     Get.toNamed(MessageScreen.routeName, arguments: arguments);
   }

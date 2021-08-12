@@ -9,6 +9,7 @@ class CustomTextField extends StatelessWidget {
     this.isSecure = false,
     this.validator,
     this.icon,
+    this.onChange,
   }) : super(key: key);
 
   final TextEditingController controller;
@@ -17,6 +18,7 @@ class CustomTextField extends StatelessWidget {
   final bool isSecure;
   final FormFieldValidator<String>? validator;
   final Widget? icon;
+  final Function(String text)? onChange;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +42,7 @@ class CustomTextField extends StatelessWidget {
       keyboardType: inputType,
       validator: validator,
       obscureText: isSecure,
+      onChanged: onChange,
     );
   }
 }

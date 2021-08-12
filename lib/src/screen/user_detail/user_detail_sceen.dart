@@ -24,11 +24,11 @@ class UserDetailScreen extends StatelessWidget {
     final Size responsive = MediaQuery.of(context).size;
 
     return GetBuilder<UserDetailController>(
-      init: UserDetailController(user: user),
+      init: UserDetailController(user: user.obs),
       builder: (controller) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(controller.user.name),
+            title: Text(controller.user.value.name),
           ),
           body: BaseScreen(
             child: SingleChildScrollView(
@@ -73,7 +73,7 @@ class UserDetailScreen extends StatelessWidget {
                                 child: Column(
                                   children: [
                                     Text(
-                                      controller.user.name,
+                                      controller.user.value.name,
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 40.0,
@@ -83,7 +83,7 @@ class UserDetailScreen extends StatelessWidget {
                                       height: responsive.height * 0.02,
                                     ),
                                     Text(
-                                      controller.user.email,
+                                      controller.user.value.email,
                                       style: TextStyle(
                                         color: Colors.black,
                                       ),
@@ -92,7 +92,7 @@ class UserDetailScreen extends StatelessWidget {
                                       height: responsive.height * 0.03,
                                     ),
                                     DetailButtonSpace(
-                                      actions: controller.user.isCurrent
+                                      actions: controller.user.value.isCurrent
                                           ? [
                                               DetailIconButton(
                                                 icon: Icons.group,
@@ -104,9 +104,17 @@ class UserDetailScreen extends StatelessWidget {
                                               ),
                                               DetailIconButton(
                                                   icon: Icons.settings,
-                                                  onTap: () {
-                                                    Get.toNamed(EditUserScreen
-                                                        .routeName);
+                                                  onTap: () async {
+                                                    final editedUser =
+                                                        await Get.toNamed(
+                                                            EditUserScreen
+                                                                .routeName);
+
+                                                    if (editedUser != null) {
+                                                      controller
+                                                          .updateEditedUser(
+                                                              editedUser);
+                                                    }
                                                   }),
                                               DetailIconButton(
                                                 backColor: Colors.red,
@@ -141,7 +149,7 @@ class UserDetailScreen extends StatelessWidget {
                                   backgroundColor: Colors.grey,
                                   radius: responsive.width * 0.2,
                                   backgroundImage:
-                                      getUserImage(controller.user),
+                                      getUserImage(controller.user.value),
                                 ),
                               ),
                             ],
